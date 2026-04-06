@@ -29,6 +29,18 @@ const CORES_CARROS = [
     '#c0392b'   // Vermelho escuro
 ];
 
+// Cores variadas para as motos
+const CORES_MOTOS = [
+    '#ff4444',  // Vermelho vivo
+    '#00bfff',  // Azul elétrico
+    '#ff8c00',  // Laranja
+    '#00ff7f',  // Verde neon
+    '#ff1493',  // Pink
+    '#ffdd00',  // Amarelo
+    '#8b00ff',  // Violeta
+    '#ffffff'   // Branca
+];
+
 // Cada tipo tem aparência e comportamento diferente
 const TIPOS_OBSTACULO = {
     carro: {
@@ -100,6 +112,8 @@ function criarObstaculo(nivelAtual) {
         velocidade: velocidade,
         cor: tipoEscolhido === 'carro'
             ? CORES_CARROS[Math.floor(Math.random() * CORES_CARROS.length)]
+            : tipoEscolhido === 'moto'
+            ? CORES_MOTOS[Math.floor(Math.random() * CORES_MOTOS.length)]
             : tipo.cor,
         tipo: tipoEscolhido,
         emoji: tipo.emoji
@@ -219,33 +233,87 @@ function desenharObstaculos(ctx) {
             ctx.fillRect(obs.x + 5, obs.y + 16, obs.largura - 10, obs.altura - 16);
 
         } else if (obs.tipo === 'moto') {
-            // Moto obstáculo: fina e rápida
+            // Moto obstáculo (visão de cima, detalhada)
             let cx = obs.x + obs.largura / 2;
+            let my = obs.y;
+            let mh = obs.altura;
 
             // Roda traseira
-            ctx.fillStyle = '#1a1a1a';
+            ctx.fillStyle = '#111';
             ctx.beginPath();
-            ctx.ellipse(cx, obs.y + obs.altura - 3, 6, 4, 0, 0, Math.PI * 2);
+            ctx.ellipse(cx, my + mh - 4, 7, 4, 0, 0, Math.PI * 2);
             ctx.fill();
+            ctx.strokeStyle = '#444';
+            ctx.lineWidth = 1;
+            ctx.stroke();
 
-            // Corpo da moto
+            // Chassi da moto (corpo colorido)
             ctx.fillStyle = obs.cor;
-            ctx.fillRect(cx - 5, obs.y + 10, 10, obs.altura - 18);
-
-            // Piloto
-            ctx.fillStyle = '#333';
             ctx.beginPath();
-            ctx.arc(cx, obs.y + 8, 6, 0, Math.PI * 2);
+            ctx.moveTo(cx - 5, my + mh - 8);
+            ctx.lineTo(cx + 5, my + mh - 8);
+            ctx.lineTo(cx + 4, my + 16);
+            ctx.lineTo(cx - 4, my + 16);
+            ctx.closePath();
             ctx.fill();
+
+            // Tanque de combustível (destaque)
+            ctx.fillStyle = obs.cor;
+            ctx.beginPath();
+            ctx.ellipse(cx, my + 20, 5, 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // Faixa no tanque
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(cx, my + 17);
+            ctx.lineTo(cx, my + 23);
+            ctx.stroke();
+
+            // Assento
+            ctx.fillStyle = '#222';
+            ctx.fillRect(cx - 4, my + 25, 8, 8);
 
             // Guidão
-            ctx.fillStyle = '#666';
-            ctx.fillRect(cx - 10, obs.y + 14, 20, 2);
+            ctx.fillStyle = '#777';
+            ctx.fillRect(cx - 12, my + 14, 24, 3);
+            // Punhos
+            ctx.fillStyle = '#222';
+            ctx.fillRect(cx - 13, my + 13, 4, 5);
+            ctx.fillRect(cx + 9, my + 13, 4, 5);
+
+            // Piloto (capacete + corpo)
+            ctx.fillStyle = '#222';
+            ctx.fillRect(cx - 6, my + 10, 12, 12);
+            // Capacete colorido (combina com a moto)
+            ctx.fillStyle = obs.cor;
+            ctx.beginPath();
+            ctx.arc(cx, my + 7, 6, 0, Math.PI * 2);
+            ctx.fill();
+            // Viseira preta
+            ctx.fillStyle = '#111';
+            ctx.beginPath();
+            ctx.arc(cx, my + 8, 4, -0.3, Math.PI + 0.3);
+            ctx.fill();
+
+            // Braços no guidão
+            ctx.fillStyle = '#222';
+            ctx.fillRect(cx - 12, my + 12, 6, 3);
+            ctx.fillRect(cx + 6, my + 12, 6, 3);
 
             // Roda dianteira
-            ctx.fillStyle = '#1a1a1a';
+            ctx.fillStyle = '#111';
             ctx.beginPath();
-            ctx.ellipse(cx, obs.y + 3, 5, 3, 0, 0, Math.PI * 2);
+            ctx.ellipse(cx, my + 3, 6, 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#444';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Farol dianteiro
+            ctx.fillStyle = '#ffff88';
+            ctx.beginPath();
+            ctx.ellipse(cx, my + 1, 3, 2, 0, 0, Math.PI * 2);
             ctx.fill();
         }
     }
