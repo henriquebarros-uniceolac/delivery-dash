@@ -38,7 +38,7 @@ let teclas = {
  */
 function inicializarJogador() {
     jogador.x = LARGURA_CANVAS / 2 - jogador.largura / 2;
-    jogador.y = ALTURA_CANVAS - jogador.altura - 20;
+    jogador.y = ALTURA_CANVAS - jogador.altura - 100; // Mais acima pra não ficar atrás dos botões
     jogador.carregando = false;
 }
 
@@ -162,8 +162,10 @@ function moverJogador() {
     if (jogador.y < 50) { // 50px de margem pro HUD
         jogador.y = 50;
     }
-    if (jogador.y + jogador.altura > ALTURA_CANVAS) {
-        jogador.y = ALTURA_CANVAS - jogador.altura;
+    // No mobile, não deixa o jogador descer até onde ficam os botões
+    let limiteInferior = ALTURA_CANVAS - 80;
+    if (jogador.y + jogador.altura > limiteInferior) {
+        jogador.y = limiteInferior - jogador.altura;
     }
 }
 

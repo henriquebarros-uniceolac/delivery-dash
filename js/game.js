@@ -78,10 +78,10 @@ function ajustarCanvas() {
         // Espaço: tela toda menos o HUD no topo (~55px)
         let alturaDisponivel = alturaTela - 55;
 
-        // Escala para preencher a tela toda
+        // Escala para CABER na tela (min = mostra tudo, não corta nada)
         let escalaLargura = larguraTela / LARGURA_CANVAS;
         let escalaAltura = alturaDisponivel / ALTURA_CANVAS;
-        let escala = Math.max(escalaLargura, escalaAltura); // max = preenche tudo
+        let escala = Math.min(escalaLargura, escalaAltura);
 
         canvas.style.width = Math.floor(LARGURA_CANVAS * escala) + 'px';
         canvas.style.height = Math.floor(ALTURA_CANVAS * escala) + 'px';
@@ -184,7 +184,7 @@ function loopPrincipal() {
         document.getElementById('tempo').textContent = tempoRestante;
 
         // Reposiciona o jogador (como um "respawn")
-        jogador.y = ALTURA_CANVAS - jogador.altura - 20;
+        jogador.y = ALTURA_CANVAS - jogador.altura - 100;
 
         // Efeito visual de dano (flash vermelho)
         canvas.style.boxShadow = '0 0 30px red';
