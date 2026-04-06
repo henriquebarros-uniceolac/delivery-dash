@@ -15,6 +15,20 @@
 let obstaculos = [];
 
 // ---------- TIPOS DE OBSTÁCULOS ----------
+// Cores variadas para os carros (cada carro ganha uma aleatória)
+const CORES_CARROS = [
+    '#e74c3c',  // Vermelho
+    '#3498db',  // Azul
+    '#2ecc71',  // Verde
+    '#f1c40f',  // Amarelo
+    '#9b59b6',  // Roxo
+    '#1abc9c',  // Verde-água
+    '#e67e22',  // Laranja
+    '#ecf0f1',  // Branco
+    '#34495e',  // Cinza escuro
+    '#c0392b'   // Vermelho escuro
+];
+
 // Cada tipo tem aparência e comportamento diferente
 const TIPOS_OBSTACULO = {
     carro: {
@@ -72,7 +86,9 @@ function criarObstaculo(nivelAtual) {
         largura: tipo.largura,
         altura: tipo.altura,
         velocidade: velocidade,
-        cor: tipo.cor,
+        cor: tipoEscolhido === 'carro'
+            ? CORES_CARROS[Math.floor(Math.random() * CORES_CARROS.length)]
+            : tipo.cor,
         tipo: tipoEscolhido,
         emoji: tipo.emoji
     };
