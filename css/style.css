@@ -1,0 +1,220 @@
+/* ========================================
+   STYLE.CSS - Estilos do Delivery Dash
+   ========================================
+   Este arquivo controla toda a aparência do jogo:
+   - Layout das telas (início, jogo, game over)
+   - Estilo dos botões e textos
+   - HUD (informações durante o jogo)
+   ======================================== */
+
+/* ---------- RESET BÁSICO ---------- */
+/* Remove margens e paddings padrão do navegador */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ---------- CORPO DA PÁGINA ---------- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a1a2e;
+    color: #ffffff;
+    overflow: hidden; /* Esconde scrollbar */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ---------- TELAS ---------- */
+/* Classe base para todas as telas */
+.tela {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Classe para esconder telas */
+.escondido {
+    display: none !important;
+}
+
+/* ---------- TELA INICIAL ---------- */
+.container-inicio {
+    text-align: center;
+    max-width: 600px;
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 20px;
+    border: 2px solid #e94560;
+}
+
+.container-inicio h1 {
+    font-size: 3em;
+    color: #e94560;
+    margin-bottom: 5px;
+    text-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+}
+
+.container-inicio h2 {
+    font-size: 1.3em;
+    color: #ffd700;
+    margin-bottom: 20px;
+}
+
+/* Caixa da história */
+.historia {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: left;
+    line-height: 1.6;
+    font-size: 0.95em;
+    color: #cccccc;
+}
+
+.historia strong {
+    color: #ffd700;
+}
+
+/* Instruções de como jogar */
+.instrucoes {
+    margin-bottom: 25px;
+}
+
+.instrucoes h3 {
+    color: #e94560;
+    margin-bottom: 10px;
+}
+
+.instrucoes p {
+    margin: 5px 0;
+    font-size: 0.95em;
+}
+
+/* ---------- BOTÕES ---------- */
+button {
+    padding: 15px 40px;
+    font-size: 1.3em;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #e94560, #c81d4e);
+    color: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(233, 69, 96, 0.6);
+}
+
+/* ---------- HUD (INFORMAÇÕES DO JOGO) ---------- */
+#hud {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 20px;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10;
+    font-size: 1.1em;
+    border-bottom: 2px solid #e94560;
+}
+
+.hud-item {
+    display: flex;
+    gap: 5px;
+}
+
+/* ---------- CANVAS DO JOGO ---------- */
+#canvas-jogo {
+    display: block;
+    border: 2px solid #333;
+    background-color: #2d2d2d;
+}
+
+/* ---------- MENSAGEM DE ENTREGA ---------- */
+#mensagem-entrega {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 200, 0, 0.9);
+    padding: 10px 25px;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-weight: bold;
+    z-index: 20;
+    animation: aparecer 0.3s ease-out;
+}
+
+/* Animação da mensagem */
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* ---------- TELA GAME OVER ---------- */
+.container-gameover {
+    text-align: center;
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 20px;
+    border: 2px solid #e94560;
+}
+
+.container-gameover h1 {
+    font-size: 2.5em;
+    color: #e94560;
+    margin-bottom: 10px;
+}
+
+.resultado {
+    margin: 25px 0;
+    font-size: 1.3em;
+    line-height: 2;
+}
+
+.resultado span {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+/* ---------- RESPONSIVIDADE ---------- */
+/* Ajustes para telas menores */
+@media (max-width: 650px) {
+    .container-inicio {
+        margin: 10px;
+        padding: 20px;
+    }
+
+    .container-inicio h1 {
+        font-size: 2em;
+    }
+
+    #hud {
+        font-size: 0.85em;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    button {
+        font-size: 1em;
+        padding: 12px 30px;
+    }
+}

@@ -1,0 +1,203 @@
+/* ========================================
+   OBSTACULOS.JS - Sistema de Obstáculos
+   ========================================
+   Gerencia os obstáculos que aparecem no jogo:
+   - Carros (se movem pela estrada)
+   - Buracos (estáticos no chão)
+   - Pedestres (andam devagar)
+
+   Os obstáculos nascem no topo e descem,
+   simulando o jogador avançando pela cidade.
+   ======================================== */
+
+// ---------- LISTA DE OBSTÁCULOS ----------
+// Array que guarda todos os obstáculos ativos
+let obstaculos = [];
+
+// ---------- TIPOS DE OBSTÁCULOS ----------
+// Cada tipo tem aparência e comportamento diferente
+const TIPOS_OBSTACULO = {
+    carro: {
+        cor: CORES.obstaculo_carro,
+        emoji: '🚗',
+        largura: 45,
+        altura: 55,
+        velocidadeExtra: 1  // Carros são mais rápidos
+    },
+    buraco: {
+        cor: CORES.obstaculo_buraco,
+        emoji: '🕳️',
+        largura: 40,
+        altura: 40,
+        velocidadeExtra: 0  // Buracos não se movem sozinhos
+    },
+    pedestre: {
+        cor: CORES.obstaculo_pedestre,
+        emoji: '🚶',
+        largura: 30,
+        altura: 35,
+        velocidadeExtra: -0.5  // Pedestres são mais lentos
+    }
+};
+
+/**
+ * criarObstaculo(nivelAtual)
+ * ---------------------------
+ * Cria um novo obstáculo com posição aleatória no topo.
+ * O tipo é escolhido aleatoriamente.
+ * A velocidade aumenta conforme o nível.
+ *
+ * @param {number} nivelAtual - Nível atual do jogo (afeta velocidade)
+ * @returns {Object} - O obstáculo criado
+ */
+function criarObstaculo(nivelAtual) {
+    // Escolhe um tipo aleatório
+    let tipos = ['carro', 'buraco', 'pedestre'];
+    let tipoEscolhido = tipos[Math.floor(Math.random() * tipos.length)];
+    let tipo = TIPOS_OBSTACULO[tipoEscolhido];
+
+    // Calcula velocidade baseada no nível
+    let velocidade = CONFIG_OBSTACULOS.velocidadeBase
+        + tipo.velocidadeExtra
+        + (nivelAtual - 1) * CONFIG_DIFICULDADE.aumentoVelocidade;
+
+    // Cria o objeto do obstáculo
+    let obstaculo = {
+        x: Math.random() * (LARGURA_CANVAS - tipo.largura),  // Posição X aleatória
+        y: -tipo.altura,   // Começa acima da tela (fora do canvas)
+        largura: tipo.largura,
+        altura: tipo.altura,
+        velocidade: velocidade,
+        cor: tipo.cor,
+        tipo: tipoEscolhido,
+        emoji: tipo.emoji
+    };
+
+    return obstaculo;
+}
+
+/**
+ * inicializarObstaculos(nivel)
+ * -----------------------------
+ * Cria os obstáculos iniciais para o nível atual.
+ * Limpa os obstáculos anteriores e gera novos.
+ *
+ * @param {number} nivel - Nível atual
+ */
+function inicializarObstaculos(nivel) {
+    obstaculos = [];
+
+    // Calcula quantos obstáculos baseado no nível
+    let quantidade = CONFIG_DIFICULDADE.obstaculosIniciais
+        + (nivel - 1) * CONFIG_DIFICULDADE.obstaculosPorNivel;
+
+    for (let i = 0; i < quantidade; i++) {
+        let obstaculo = criarObstaculo(nivel);
+        // Distribui verticalmente para não começarem todos juntos
+        obstaculo.y = -Math.random() * ALTURA_CANVAS;
+        obstaculos.push(obstaculo);
+    }
+}
+
+/**
+ * atualizarObstaculos(nivel)
+ * ---------------------------
+ * Move todos os obstáculos para baixo.
+ * Quando um sai da tela, reposiciona no topo
+ * com nova posição X aleatória.
+ *
+ * @param {number} nivel - Nível atual (para ajustar velocidade)
+ */
+function atualizarObstaculos(nivel) {
+    for (let i = 0; i < obstaculos.length; i++) {
+        let obs = obstaculos[i];
+
+        // Move para baixo
+        obs.y += obs.velocidade;
+
+        // Se saiu da tela por baixo, reposiciona no topo
+        if (obs.y > ALTURA_CANVAS) {
+            obs.y = -obs.altura - Math.random() * 100;
+            obs.x = Math.random() * (LARGURA_CANVAS - obs.largura);
+
+            // Recalcula velocidade (pode ter mudado de nível)
+            let tipo = TIPOS_OBSTACULO[obs.tipo];
+            obs.velocidade = CONFIG_OBSTACULOS.velocidadeBase
+                + tipo.velocidadeExtra
+                + (nivel - 1) * CONFIG_DIFICULDADE.aumentoVelocidade;
+        }
+    }
+}
+
+/**
+ * desenharObstaculos(ctx)
+ * ------------------------
+ * Desenha todos os obstáculos no canvas.
+ * Cada tipo tem uma aparência diferente.
+ *
+ * @param {CanvasRenderingContext2D} ctx - Contexto do canvas
+ */
+function desenharObstaculos(ctx) {
+    for (let i = 0; i < obstaculos.length; i++) {
+        let obs = obstaculos[i];
+
+        // Desenha o corpo do obstáculo
+        ctx.fillStyle = obs.cor;
+
+        if (obs.tipo === 'carro') {
+            // Carro: retângulo com detalhes
+            ctx.fillRect(obs.x, obs.y, obs.largura, obs.altura);
+            // Janelas do carro
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(obs.x + 5, obs.y + 8, obs.largura - 10, 12);
+            // Rodas
+            ctx.fillStyle = '#333';
+            ctx.fillRect(obs.x - 3, obs.y + 5, 6, 10);
+            ctx.fillRect(obs.x + obs.largura - 3, obs.y + 5, 6, 10);
+            ctx.fillRect(obs.x - 3, obs.y + obs.altura - 15, 6, 10);
+            ctx.fillRect(obs.x + obs.largura - 3, obs.y + obs.altura - 15, 6, 10);
+
+        } else if (obs.tipo === 'buraco') {
+            // Buraco: círculo escuro
+            ctx.beginPath();
+            ctx.ellipse(
+                obs.x + obs.largura / 2,
+                obs.y + obs.altura / 2,
+                obs.largura / 2,
+                obs.altura / 3,
+                0, 0, Math.PI * 2
+            );
+            ctx.fill();
+            // Borda do buraco
+            ctx.strokeStyle = '#555555';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+        } else if (obs.tipo === 'pedestre') {
+            // Pedestre: círculo (cabeça) + retângulo (corpo)
+            ctx.fillStyle = obs.cor;
+            // Cabeça
+            ctx.beginPath();
+            ctx.arc(obs.x + obs.largura / 2, obs.y + 8, 8, 0, Math.PI * 2);
+            ctx.fill();
+            // Corpo
+            ctx.fillRect(obs.x + 5, obs.y + 16, obs.largura - 10, obs.altura - 16);
+        }
+    }
+}
+
+/**
+ * verificarColisaoObstaculos()
+ * -----------------------------
+ * Verifica se o jogador colidiu com algum obstáculo.
+ *
+ * @returns {boolean} - true se houve colisão
+ */
+function verificarColisaoObstaculos() {
+    for (let i = 0; i < obstaculos.length; i++) {
+        if (verificarColisao(jogador, obstaculos[i])) {
+            return true;
+        }
+    }
+    return false;
+}

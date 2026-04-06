@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Dash - Brasília</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ==================== TELA INICIAL ==================== -->
+    <div id="tela-inicio" class="tela">
+        <div class="container-inicio">
+            <h1>🏍️ Delivery Dash</h1>
+            <h2>Brasília Edition</h2>
+
+            <div class="historia">
+                <p>
+                    Em Brasília, a capital do caos urbano, você é <strong>Alex</strong>,
+                    o entregador mais rápido da cidade. Uma tempestade colossal paralisa
+                    a metrópole: ruas alagadas, trânsito engarrafado e pedestres desesperados.
+                </p>
+                <p>
+                    Sua missão: pilotar sua bike pelas avenidas do <strong>Eixo Monumental</strong>,
+                    desviando de obstáculos e fazendo entregas antes que o tempo acabe!
+                </p>
+            </div>
+
+            <div class="instrucoes">
+                <h3>Como Jogar</h3>
+                <p>⬅️ ➡️ ⬆️ ⬇️ Setas do teclado para mover</p>
+                <p>📦 Colete os pedidos (caixas)</p>
+                <p>🏠 Entregue no destino (marcador verde)</p>
+                <p>🚗 Desvie dos obstáculos!</p>
+            </div>
+
+            <button id="btn-jogar" onclick="iniciarJogo()">🚀 Começar Entrega!</button>
+        </div>
+    </div>
+
+    <!-- ==================== TELA DO JOGO ==================== -->
+    <div id="tela-jogo" class="tela escondido">
+        <!-- HUD (informações na tela) -->
+        <div id="hud">
+            <div class="hud-item">
+                <span>⏱️ Tempo:</span>
+                <span id="tempo">60</span>s
+            </div>
+            <div class="hud-item">
+                <span>⭐ Pontos:</span>
+                <span id="pontos">0</span>
+            </div>
+            <div class="hud-item">
+                <span>📦 Entregas:</span>
+                <span id="entregas">0</span>
+            </div>
+            <div class="hud-item">
+                <span>🏎️ Nível:</span>
+                <span id="nivel">1</span>
+            </div>
+        </div>
+
+        <!-- Canvas onde o jogo é desenhado -->
+        <canvas id="canvas-jogo"></canvas>
+
+        <!-- Mensagem de entrega -->
+        <div id="mensagem-entrega" class="escondido">📦 Pedido coletado! Vá até o destino 🏠</div>
+    </div>
+
+    <!-- ==================== TELA GAME OVER ==================== -->
+    <div id="tela-gameover" class="tela escondido">
+        <div class="container-gameover">
+            <h1>⏰ Tempo Esgotado!</h1>
+            <p>O rush venceu dessa vez...</p>
+
+            <div class="resultado">
+                <p>⭐ Pontuação: <span id="pontos-final">0</span></p>
+                <p>📦 Entregas: <span id="entregas-final">0</span></p>
+                <p>🏎️ Nível alcançado: <span id="nivel-final">1</span></p>
+            </div>
+
+            <button id="btn-reiniciar" onclick="voltarInicio()">🔄 Tentar Novamente</button>
+        </div>
+    </div>
+
+    <!-- Scripts organizados por responsabilidade -->
+    <script src="js/config.js"></script>
+    <script src="js/jogador.js"></script>
+    <script src="js/obstaculos.js"></script>
+    <script src="js/entregas.js"></script>
+    <script src="js/game.js"></script>
+
+</body>
+</html>
