@@ -43,20 +43,23 @@
         <!-- HUD (informações na tela) -->
         <div id="hud">
             <div class="hud-item">
-                <span>⏱️ Tempo:</span>
+                <span id="vidas-display">❤️❤️❤️❤️❤️</span>
+            </div>
+            <div class="hud-item">
+                <span>⏱️</span>
                 <span id="tempo">60</span>s
             </div>
             <div class="hud-item">
-                <span>⭐ Pontos:</span>
+                <span>⭐</span>
                 <span id="pontos">0</span>
             </div>
             <div class="hud-item">
-                <span>📦 Entregas:</span>
+                <span>📦</span>
                 <span id="entregas">0</span>
             </div>
             <div class="hud-item">
-                <span>🏎️ Nível:</span>
-                <span id="nivel">1</span>
+                <span id="nivel-nome">Dia</span>
+                <span>Nv.<span id="nivel">1</span></span>
             </div>
         </div>
 
@@ -83,8 +86,8 @@
     <!-- ==================== TELA GAME OVER ==================== -->
     <div id="tela-gameover" class="tela escondido">
         <div class="container-gameover">
-            <h1>⏰ Tempo Esgotado!</h1>
-            <p>O rush venceu dessa vez...</p>
+            <h1 id="titulo-gameover">⏰ Tempo Esgotado!</h1>
+            <p id="subtitulo-gameover">O rush venceu dessa vez...</p>
 
             <div class="resultado">
                 <p>⭐ Pontuação: <span id="pontos-final">0</span></p>

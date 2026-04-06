@@ -56,10 +56,13 @@ function criarObstaculo(nivelAtual) {
     let tipoEscolhido = tipos[Math.floor(Math.random() * tipos.length)];
     let tipo = TIPOS_OBSTACULO[tipoEscolhido];
 
-    // Calcula velocidade baseada no nível
+    // Calcula velocidade baseada no nível (com teto)
     let velocidade = CONFIG_OBSTACULOS.velocidadeBase
         + tipo.velocidadeExtra
         + (nivelAtual - 1) * CONFIG_DIFICULDADE.aumentoVelocidade;
+    if (velocidade > CONFIG_DIFICULDADE.velocidadeMaxima) {
+        velocidade = CONFIG_DIFICULDADE.velocidadeMaxima;
+    }
 
     // Cria o objeto do obstáculo (só na área da estrada: 135px a 665px)
     let zonaEstrada = LARGURA_CANVAS - 270; // Largura da estrada (sem calçadas)
@@ -88,9 +91,12 @@ function criarObstaculo(nivelAtual) {
 function inicializarObstaculos(nivel) {
     obstaculos = [];
 
-    // Calcula quantos obstáculos baseado no nível
+    // Calcula quantos obstáculos baseado no nível (com teto máximo)
     let quantidade = CONFIG_DIFICULDADE.obstaculosIniciais
         + (nivel - 1) * CONFIG_DIFICULDADE.obstaculosPorNivel;
+    if (quantidade > CONFIG_DIFICULDADE.obstaculosMaximo) {
+        quantidade = CONFIG_DIFICULDADE.obstaculosMaximo;
+    }
 
     for (let i = 0; i < quantidade; i++) {
         let obstaculo = criarObstaculo(nivel);

@@ -28,6 +28,17 @@ let jogoRodando = false;  // Se o jogo está ativo
 let timerIntervalo;   // Referência do setInterval do timer
 let animacaoFrame;    // Referência do requestAnimationFrame
 
+// ---------- SISTEMA DE VIDAS ----------
+let vidas = 5;              // Vidas atuais
+let framesInvencivel = 0;   // Contador de invencibilidade (pisca após dano)
+let coracaoItem = null;     // Coração de recuperação na pista
+let timerCoracao = null;    // Timer para spawnar coração
+
+// ---------- EFEITOS VISUAIS ----------
+let cenarioAtual = null;    // Objeto com cores/efeitos do nível
+let gotasChuva = [];        // Array de gotas de chuva
+let frameRelampago = 0;     // Contador para efeito de relâmpago
+
 // Variáveis para o efeito da estrada
 let offsetEstrada = 0; // Para animar as faixas da estrada
 
@@ -116,6 +127,27 @@ function iniciarJogo() {
     nivelAtual = 1;
     jogoRodando = true;
 
+    // Reseta vidas
+    vidas = CONFIG_VIDAS.inicial;
+    framesInvencivel = 0;
+    coracaoItem = null;
+    if (timerCoracao) clearTimeout(timerCoracao);
+
+    // Reseta efeitos visuais
+    cenarioAtual = obterCenarioNivel(1);
+    gotasChuva = [];
+    frameRelampago = 0;
+
+    // Reseta prédios nas posições iniciais
+    prediosEsquerda[0].y = 0;
+    prediosEsquerda[1].y = 180;
+    prediosEsquerda[2].y = 360;
+    prediosEsquerda[3].y = 540;
+    prediosDireita[0].y = 0;
+    prediosDireita[1].y = 180;
+    prediosDireita[2].y = 360;
+    prediosDireita[3].y = 540;
+
     // Reseta teclas (evita jogador sair andando)
     teclas.ArrowUp = false;
     teclas.ArrowDown = false;
@@ -138,9 +170,9 @@ function iniciarJogo() {
 
         // Tempo acabou = Game Over
         if (tempoRestante <= 0) {
-            gameOver();
+            gameOver('tempo');
         }
-    }, 1000); // Executa a cada 1 segundo
+    }, 1000);
 
     // Inicia o loop principal
     loopPrincipal();
@@ -172,32 +204,70 @@ function loopPrincipal() {
     // 4. Desenha pedido/destino
     desenharEntregas(ctx);
 
-    // 5. Move e desenha o jogador
+    // 5. Desenha coração de recuperação (se existir)
+    if (coracaoItem) {
+        desenharCoracao(ctx);
+    }
+
+    // 6. Move e desenha o jogador
     moverJogador();
-    desenharJogador(ctx);
 
-    // 6. Verifica colisões
-    // Colisão com obstáculo = perde tempo
-    if (verificarColisaoObstaculos()) {
-        tempoRestante -= 3; // Perde 3 segundos
-        document.getElementById('tempo').textContent = tempoRestante;
+    // Conta invencibilidade (jogador pisca)
+    if (framesInvencivel > 0) {
+        framesInvencivel--;
+    }
 
-        // Reposiciona o jogador (como um "respawn")
+    // Desenha jogador (pisca se invencível)
+    if (framesInvencivel > 0 && Math.floor(framesInvencivel / 5) % 2 === 0) {
+        // Não desenha nesse frame (efeito de piscar)
+    } else {
+        desenharJogador(ctx);
+    }
+
+    // 7. Verifica colisões com obstáculos
+    // Só toma dano se NÃO estiver invencível
+    if (framesInvencivel === 0 && verificarColisaoObstaculos()) {
+        vidas--;
+
+        if (vidas <= 0) {
+            gameOver('vidas');
+            return;
+        }
+
+        // Ativa invencibilidade temporária
+        framesInvencivel = CONFIG_VIDAS.invencivel;
+
+        // Reposiciona o jogador (respawn)
         jogador.y = ALTURA_CANVAS - jogador.altura - 100;
 
         // Efeito visual de dano (flash vermelho)
         canvas.style.boxShadow = '0 0 30px red';
         setTimeout(function() {
             canvas.style.boxShadow = 'none';
-        }, 200);
+        }, 300);
 
-        if (tempoRestante <= 0) {
-            gameOver();
-            return;
+        mostrarMensagem('💔 -1 vida! Restam ' + vidas);
+
+        // Agenda aparição de coração de recuperação
+        agendarCoracao();
+    }
+
+    // 8. Verifica coleta de coração
+    if (coracaoItem && framesInvencivel === 0) {
+        if (verificarColisao(jogador, coracaoItem)) {
+            if (vidas < CONFIG_VIDAS.inicial) {
+                vidas++;
+                mostrarMensagem('❤️ +1 vida!');
+            } else {
+                // Já tem vida cheia, ganha pontos
+                pontuacao += 50;
+                mostrarMensagem('⭐ +50 pts (vida cheia!)');
+            }
+            coracaoItem = null;
         }
     }
 
-    // Verifica entregas
+    // 9. Verifica entregas
     let resultadoEntrega = verificarEntregas();
 
     if (resultadoEntrega.coletou) {
@@ -210,20 +280,40 @@ function loopPrincipal() {
         tempoRestante += CONFIG_TEMPO.bonusEntrega;
         totalEntregas++;
 
-        mostrarMensagem('✅ Entrega feita! +' + CONFIG_ENTREGAS.pontosEntrega + ' pts | +' + CONFIG_TEMPO.bonusEntrega + 's');
+        mostrarMensagem('✅ +' + CONFIG_ENTREGAS.pontosEntrega + ' pts | +' + CONFIG_TEMPO.bonusEntrega + 's');
 
         // Verifica se subiu de nível
         if (totalEntregas % CONFIG_DIFICULDADE.entregasPorNivel === 0) {
             nivelAtual++;
+            cenarioAtual = obterCenarioNivel(nivelAtual);
+
+            // Adiciona obstáculos gradualmente (respeitando o máximo)
+            let novaQuantidade = CONFIG_DIFICULDADE.obstaculosIniciais
+                + (nivelAtual - 1) * CONFIG_DIFICULDADE.obstaculosPorNivel;
+            if (novaQuantidade > CONFIG_DIFICULDADE.obstaculosMaximo) {
+                novaQuantidade = CONFIG_DIFICULDADE.obstaculosMaximo;
+            }
             inicializarObstaculos(nivelAtual);
-            mostrarMensagem('⬆️ NÍVEL ' + nivelAtual + '! Mais obstáculos!');
+
+            mostrarMensagem('⬆️ NÍVEL ' + nivelAtual + ' - ' + cenarioAtual.nome + '!');
+
+            // Inicializa gotas de chuva se necessário
+            if (cenarioAtual.chuva && gotasChuva.length === 0) {
+                inicializarChuva();
+            }
+            if (!cenarioAtual.chuva) {
+                gotasChuva = [];
+            }
         }
 
         // Cria novo pedido
         criarPedido();
     }
 
-    // 7. Atualiza HUD
+    // 10. Efeitos visuais do cenário
+    desenharEfeitosCenario();
+
+    // 11. Atualiza HUD
     atualizarHUD();
 
     // Agenda o próximo frame
@@ -240,24 +330,27 @@ function desenharCenario() {
     // Largura das calçadas (onde ficam os prédios)
     let larguraCalcada = 130;
 
-    // Grama (fundo verde de Brasília)
-    ctx.fillStyle = CORES.grama;
+    // Usa cores do cenário atual (muda conforme o nível)
+    let c = cenarioAtual;
+
+    // Grama (muda de cor conforme horário)
+    ctx.fillStyle = c.grama;
     ctx.fillRect(0, 0, LARGURA_CANVAS, ALTURA_CANVAS);
 
-    // Calçadas laterais (concreto claro, estilo Esplanada)
-    ctx.fillStyle = '#c4b9a0';
+    // Calçadas laterais
+    ctx.fillStyle = c.calcada;
     ctx.fillRect(0, 0, larguraCalcada, ALTURA_CANVAS);
     ctx.fillRect(LARGURA_CANVAS - larguraCalcada, 0, larguraCalcada, ALTURA_CANVAS);
 
-    // Estrada principal (asfalto do Eixo Monumental)
-    ctx.fillStyle = CORES.estrada;
+    // Estrada principal (asfalto)
+    ctx.fillStyle = c.estrada;
     ctx.fillRect(larguraCalcada, 0, LARGURA_CANVAS - larguraCalcada * 2, ALTURA_CANVAS);
 
     // ========== FAIXAS DA ESTRADA ==========
     offsetEstrada += 1.5; // Velocidade das faixas da estrada
     if (offsetEstrada > 60) offsetEstrada = 0;
 
-    ctx.fillStyle = CORES.faixa;
+    ctx.fillStyle = c.faixa;
     // Faixa central tracejada
     for (let y = -60 + offsetEstrada; y < ALTURA_CANVAS; y += 60) {
         ctx.fillRect(LARGURA_CANVAS / 2 - 2, y, 4, 30);
@@ -497,6 +590,14 @@ function atualizarHUD() {
     document.getElementById('pontos').textContent = pontuacao;
     document.getElementById('entregas').textContent = totalEntregas;
     document.getElementById('nivel').textContent = nivelAtual;
+    document.getElementById('nivel-nome').textContent = cenarioAtual.nome;
+
+    // Atualiza corações
+    let coracoes = '';
+    for (let i = 0; i < CONFIG_VIDAS.inicial; i++) {
+        coracoes += i < vidas ? '❤️' : '🖤';
+    }
+    document.getElementById('vidas-display').textContent = coracoes;
 }
 
 /**
@@ -518,17 +619,29 @@ function mostrarMensagem(texto) {
 }
 
 /**
- * gameOver()
- * ------------
- * Chamada quando o tempo acaba.
- * Para o jogo e mostra a tela de resultado.
+ * gameOver(motivo)
+ * ------------------
+ * Chamada quando o jogador perde.
+ * Pode ser por tempo esgotado ou vidas zeradas.
+ *
+ * @param {string} motivo - 'tempo' ou 'vidas'
  */
-function gameOver() {
+function gameOver(motivo) {
     jogoRodando = false;
 
     // Para o timer e a animação
     clearInterval(timerIntervalo);
     cancelAnimationFrame(animacaoFrame);
+    if (timerCoracao) clearTimeout(timerCoracao);
+
+    // Mensagem diferente conforme o motivo
+    if (motivo === 'vidas') {
+        document.getElementById('titulo-gameover').textContent = '💀 Sem Vidas!';
+        document.getElementById('subtitulo-gameover').textContent = 'A moto não aguentou tantas batidas...';
+    } else {
+        document.getElementById('titulo-gameover').textContent = '⏰ Tempo Esgotado!';
+        document.getElementById('subtitulo-gameover').textContent = 'O rush venceu dessa vez...';
+    }
 
     // Atualiza tela de game over
     document.getElementById('pontos-final').textContent = pontuacao;
@@ -544,9 +657,173 @@ function gameOver() {
  * voltarInicio()
  * ----------------
  * Volta para a tela inicial.
- * Chamada pelo botão "Tentar Novamente".
  */
 function voltarInicio() {
     document.getElementById('tela-gameover').classList.add('escondido');
     document.getElementById('tela-inicio').classList.remove('escondido');
+}
+
+// ========================================
+// SISTEMA DE CORAÇÃO DE RECUPERAÇÃO
+// ========================================
+
+/**
+ * agendarCoracao()
+ * ------------------
+ * Após perder uma vida, agenda um coração para
+ * aparecer na pista depois de alguns segundos.
+ * Só aparece se não houver um coração já na pista.
+ */
+function agendarCoracao() {
+    if (coracaoItem) return; // Já tem um na pista
+
+    timerCoracao = setTimeout(function() {
+        if (!jogoRodando) return;
+        // Cria coração em posição aleatória na estrada
+        coracaoItem = {
+            x: 140 + Math.random() * (LARGURA_CANVAS - 280),
+            y: 80 + Math.random() * (ALTURA_CANVAS - 250),
+            largura: 25,
+            altura: 25
+        };
+    }, CONFIG_VIDAS.tempoCoracaoAparecer * 1000);
+}
+
+/**
+ * desenharCoracao(ctx)
+ * ----------------------
+ * Desenha o coração de recuperação na pista.
+ * Pulsa para chamar atenção.
+ */
+function desenharCoracao(ctx) {
+    if (!coracaoItem) return;
+
+    let pulso = Math.sin(Date.now() / 200) * 3;
+    let cx = coracaoItem.x + coracaoItem.largura / 2;
+    let cy = coracaoItem.y + coracaoItem.altura / 2;
+    let tamanho = 12 + pulso;
+
+    // Brilho atrás
+    ctx.fillStyle = 'rgba(255, 50, 50, 0.3)';
+    ctx.beginPath();
+    ctx.arc(cx, cy, tamanho + 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Coração (dois semicírculos + triângulo)
+    ctx.fillStyle = '#ff2d55';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + tamanho * 0.7);
+    ctx.bezierCurveTo(cx - tamanho, cy, cx - tamanho, cy - tamanho * 0.7, cx, cy - tamanho * 0.3);
+    ctx.bezierCurveTo(cx + tamanho, cy - tamanho * 0.7, cx + tamanho, cy, cx, cy + tamanho * 0.7);
+    ctx.fill();
+
+    // Texto
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 9px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('+1', cx, cy + tamanho + 14);
+    ctx.textAlign = 'start';
+}
+
+// ========================================
+// EFEITOS VISUAIS DE CENÁRIO
+// ========================================
+
+/**
+ * inicializarChuva()
+ * --------------------
+ * Cria as gotas de chuva iniciais.
+ */
+function inicializarChuva() {
+    gotasChuva = [];
+    let quantidade = cenarioAtual.relampago ? 150 : 80; // Mais gotas na tempestade
+    for (let i = 0; i < quantidade; i++) {
+        gotasChuva.push({
+            x: Math.random() * LARGURA_CANVAS,
+            y: Math.random() * ALTURA_CANVAS,
+            velocidade: 4 + Math.random() * 4,
+            comprimento: 8 + Math.random() * 12
+        });
+    }
+}
+
+/**
+ * desenharEfeitosCenario()
+ * --------------------------
+ * Desenha efeitos visuais por cima do jogo:
+ * - Escuridão (overlay escuro)
+ * - Chuva (gotas caindo)
+ * - Neblina (overlay branco)
+ * - Relâmpagos (flash branco ocasional)
+ *
+ * Chamada APÓS desenhar tudo, como camada final.
+ */
+function desenharEfeitosCenario() {
+    let c = cenarioAtual;
+
+    // --- ESCURIDÃO (overlay escuro sobre tudo) ---
+    if (c.escuridao > 0) {
+        ctx.fillStyle = 'rgba(0, 0, 10, ' + c.escuridao + ')';
+        ctx.fillRect(0, 0, LARGURA_CANVAS, ALTURA_CANVAS);
+
+        // Farol da moto (cone de luz à frente do jogador)
+        if (c.escuridao >= 0.3) {
+            let grad = ctx.createRadialGradient(
+                jogador.x + jogador.largura / 2, jogador.y - 10,
+                5,
+                jogador.x + jogador.largura / 2, jogador.y - 60,
+                80
+            );
+            grad.addColorStop(0, 'rgba(255, 255, 200, 0.25)');
+            grad.addColorStop(1, 'rgba(255, 255, 200, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(jogador.x - 60, jogador.y - 140, jogador.largura + 120, 150);
+        }
+    }
+
+    // --- CHUVA ---
+    if (c.chuva && gotasChuva.length > 0) {
+        ctx.strokeStyle = 'rgba(150, 180, 255, 0.4)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < gotasChuva.length; i++) {
+            let gota = gotasChuva[i];
+            ctx.beginPath();
+            ctx.moveTo(gota.x, gota.y);
+            ctx.lineTo(gota.x - 1, gota.y + gota.comprimento);
+            ctx.stroke();
+
+            // Move a gota para baixo
+            gota.y += gota.velocidade;
+            gota.x -= 0.5; // Leve inclinação (vento)
+
+            // Reseta quando sai da tela
+            if (gota.y > ALTURA_CANVAS) {
+                gota.y = -gota.comprimento;
+                gota.x = Math.random() * LARGURA_CANVAS;
+            }
+        }
+    }
+
+    // --- NEBLINA ---
+    if (c.neblina) {
+        ctx.fillStyle = 'rgba(180, 180, 200, 0.15)';
+        ctx.fillRect(0, 0, LARGURA_CANVAS, ALTURA_CANVAS);
+
+        // Faixas de neblina ondulantes
+        let onda = Math.sin(Date.now() / 2000) * 20;
+        ctx.fillStyle = 'rgba(200, 200, 220, 0.1)';
+        ctx.fillRect(0, 150 + onda, LARGURA_CANVAS, 80);
+        ctx.fillRect(0, 350 - onda, LARGURA_CANVAS, 60);
+    }
+
+    // --- RELÂMPAGO ---
+    if (c.relampago) {
+        frameRelampago++;
+        // Relâmpago aleatório a cada ~4 segundos
+        if (frameRelampago > 240 && Math.random() < 0.01) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.fillRect(0, 0, LARGURA_CANVAS, ALTURA_CANVAS);
+            frameRelampago = 0;
+        }
+    }
 }

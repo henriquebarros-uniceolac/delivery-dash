@@ -12,8 +12,6 @@
 // Resolução INTERNA fixa do jogo (nunca muda).
 // No mobile, o CSS escala visualmente para caber na tela,
 // mas o jogo SEMPRE usa 800x600 internamente.
-// Isso garante que obstáculos, jogador e pistas ficam
-// no tamanho correto em qualquer dispositivo.
 const LARGURA_CANVAS = 800;
 const ALTURA_CANVAS = 600;
 
@@ -31,19 +29,33 @@ const CONFIG_TEMPO = {
     bonusEntrega: 10   // Segundos extras por entrega concluída
 };
 
+// ---------- CONFIGURAÇÕES DE VIDAS ----------
+const CONFIG_VIDAS = {
+    inicial: 5,            // Começa com 5 vidas (corações)
+    invencivel: 90,        // Frames de invencibilidade após dano (~1.5 segundos)
+    tempoCoracaoAparecer: 5 // Segundos até um coração de recuperação aparecer na pista
+};
+
 // ---------- CONFIGURAÇÕES DE DIFICULDADE ----------
+// A dificuldade sobe gradualmente — desafiante mas sempre jogável
 const CONFIG_DIFICULDADE = {
     // A cada X entregas, sobe de nível
     entregasPorNivel: 3,
 
     // Quantidade inicial de obstáculos na tela
-    obstaculosIniciais: 4,
+    obstaculosIniciais: 3,
 
-    // Obstáculos adicionais por nível
-    obstaculosPorNivel: 2,
+    // Obstáculos adicionais por nível (máximo de 1 novo por vez)
+    obstaculosPorNivel: 1,
 
-    // Aumento de velocidade dos obstáculos por nível
-    aumentoVelocidade: 0.5
+    // Máximo de obstáculos na tela (nunca fica impossível)
+    obstaculosMaximo: 12,
+
+    // Aumento de velocidade dos obstáculos por nível (suave)
+    aumentoVelocidade: 0.25,
+
+    // Velocidade máxima dos obstáculos (teto)
+    velocidadeMaxima: 5
 };
 
 // ---------- CONFIGURAÇÕES DOS OBSTÁCULOS ----------
@@ -52,7 +64,7 @@ const CONFIG_OBSTACULOS = {
     larguraMax: 70,     // Largura máxima
     alturaMin: 40,      // Altura mínima
     alturaMax: 60,      // Altura máxima
-    velocidadeBase: 2   // Velocidade base de movimento
+    velocidadeBase: 1.5 // Velocidade base de movimento
 };
 
 // ---------- CONFIGURAÇÕES DAS ENTREGAS ----------
@@ -76,3 +88,110 @@ const CORES = {
     destino: '#2ecc71',        // Destino (verde)
     jogador: '#00d4ff'         // Jogador (azul)
 };
+
+// ---------- CONFIGURAÇÕES DE CENÁRIO POR NÍVEL ----------
+// Cada nível muda a aparência do jogo para dar variedade
+// e sensação de progressão. Definido como função para facilitar.
+/**
+ * obterCenarioNivel(nivel)
+ * -------------------------
+ * Retorna as cores e efeitos visuais para cada nível.
+ * O cenário muda gradualmente conforme o jogador avança.
+ *
+ * Nível 1-2:  Dia ensolarado (verde, céu claro)
+ * Nível 3-4:  Entardecer (tons de laranja)
+ * Nível 5-6:  Noite (escuro, asfalto mais escuro)
+ * Nível 7-8:  Noite com chuva (gotas na tela)
+ * Nível 9-10: Amanhecendo com neblina (tons claros)
+ * Nível 11+:  Tempestade (chuva forte + relâmpagos)
+ *
+ * @param {number} nivel - Nível atual do jogo
+ * @returns {Object} - Cores e flags de efeitos
+ */
+function obterCenarioNivel(nivel) {
+    if (nivel <= 2) {
+        // DIA ENSOLARADO
+        return {
+            nome: 'Dia Ensolarado',
+            grama: '#2d5a1e',
+            calcada: '#c4b9a0',
+            estrada: '#3d3d3d',
+            faixa: '#ffffff',
+            ceu: '#87CEEB',
+            chuva: false,
+            neblina: false,
+            relampago: false,
+            escuridao: 0   // 0 = totalmente claro
+        };
+    } else if (nivel <= 4) {
+        // ENTARDECER
+        return {
+            nome: 'Entardecer',
+            grama: '#4a5a1e',
+            calcada: '#b8a080',
+            estrada: '#353535',
+            faixa: '#f0e0c0',
+            ceu: '#e8734a',
+            chuva: false,
+            neblina: false,
+            relampago: false,
+            escuridao: 0.1
+        };
+    } else if (nivel <= 6) {
+        // NOITE
+        return {
+            nome: 'Noite',
+            grama: '#0d2a0e',
+            calcada: '#4a4a3a',
+            estrada: '#1a1a1a',
+            faixa: '#999999',
+            ceu: '#0a0a2a',
+            chuva: false,
+            neblina: false,
+            relampago: false,
+            escuridao: 0.35
+        };
+    } else if (nivel <= 8) {
+        // NOITE COM CHUVA
+        return {
+            nome: 'Chuva Noturna',
+            grama: '#0d2a0e',
+            calcada: '#3a3a2a',
+            estrada: '#151515',
+            faixa: '#777777',
+            ceu: '#050520',
+            chuva: true,
+            neblina: false,
+            relampago: false,
+            escuridao: 0.4
+        };
+    } else if (nivel <= 10) {
+        // AMANHECENDO COM NEBLINA
+        return {
+            nome: 'Neblina',
+            grama: '#3a5a2e',
+            calcada: '#a0a090',
+            estrada: '#3a3a3a',
+            faixa: '#cccccc',
+            ceu: '#8899aa',
+            chuva: false,
+            neblina: true,
+            relampago: false,
+            escuridao: 0.15
+        };
+    } else {
+        // TEMPESTADE (nível 11+)
+        return {
+            nome: 'Tempestade',
+            grama: '#0a1a0a',
+            calcada: '#2a2a2a',
+            estrada: '#111111',
+            faixa: '#666666',
+            ceu: '#030315',
+            chuva: true,
+            neblina: true,
+            relampago: true,
+            escuridao: 0.45
+        };
+    }
+}
