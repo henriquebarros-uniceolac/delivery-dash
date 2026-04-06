@@ -51,8 +51,8 @@ const CONFIG_DIFICULDADE = {
     // Obstáculos adicionais por nível (máximo de 1 novo por vez)
     obstaculosPorNivel: 1,
 
-    // Máximo de obstáculos na tela (nunca fica impossível)
-    obstaculosMaximo: 12,
+    // Máximo de obstáculos na tela (equilibrado pra ter passagem)
+    obstaculosMaximo: 8,
 
     // Aumento de velocidade dos obstáculos por nível (suave)
     aumentoVelocidade: 0.25,

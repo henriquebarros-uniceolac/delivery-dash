@@ -51,6 +51,13 @@ const TIPOS_OBSTACULO = {
         largura: 30,
         altura: 35,
         velocidadeExtra: -0.5  // Pedestres são mais lentos
+    },
+    moto: {
+        cor: '#ff6600',
+        emoji: '🏍️',
+        largura: 28,
+        altura: 45,
+        velocidadeExtra: 1.5   // Motos são as mais rápidas
     }
 };
 
@@ -65,8 +72,13 @@ const TIPOS_OBSTACULO = {
  * @returns {Object} - O obstáculo criado
  */
 function criarObstaculo(nivelAtual) {
-    // Escolhe um tipo aleatório
+    // Tipos disponíveis mudam conforme o nível
+    // Nível 1-7: carro, buraco, pedestre
+    // Nível 8+: adiciona motos (mais rápidas e finas)
     let tipos = ['carro', 'buraco', 'pedestre'];
+    if (nivelAtual >= 8) {
+        tipos.push('moto');
+    }
     let tipoEscolhido = tipos[Math.floor(Math.random() * tipos.length)];
     let tipo = TIPOS_OBSTACULO[tipoEscolhido];
 
@@ -205,6 +217,36 @@ function desenharObstaculos(ctx) {
             ctx.fill();
             // Corpo
             ctx.fillRect(obs.x + 5, obs.y + 16, obs.largura - 10, obs.altura - 16);
+
+        } else if (obs.tipo === 'moto') {
+            // Moto obstáculo: fina e rápida
+            let cx = obs.x + obs.largura / 2;
+
+            // Roda traseira
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.ellipse(cx, obs.y + obs.altura - 3, 6, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Corpo da moto
+            ctx.fillStyle = obs.cor;
+            ctx.fillRect(cx - 5, obs.y + 10, 10, obs.altura - 18);
+
+            // Piloto
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(cx, obs.y + 8, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Guidão
+            ctx.fillStyle = '#666';
+            ctx.fillRect(cx - 10, obs.y + 14, 20, 2);
+
+            // Roda dianteira
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.ellipse(cx, obs.y + 3, 5, 3, 0, 0, Math.PI * 2);
+            ctx.fill();
         }
     }
 }

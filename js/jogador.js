@@ -217,23 +217,35 @@ function desenharJogador(ctx) {
     ctx.fill();
 
     // ===== ALEX (o entregador) =====
+    // Verifica se está chovendo para trocar a roupa
+    let estaChovendo = cenarioAtual && cenarioAtual.chuva;
 
-    // Corpo do Alex (jaqueta de entregador)
-    ctx.fillStyle = '#00b894';
+    // Corpo do Alex (jaqueta normal OU capa de chuva preta)
+    let corRoupa = estaChovendo ? '#1a1a1a' : '#00b894';
+    ctx.fillStyle = corRoupa;
     ctx.fillRect(cx - 8, y + 12, 16, 14);
 
+    // Capuz da capa de chuva (só quando chove)
+    if (estaChovendo) {
+        ctx.fillStyle = '#1a1a1a';
+        // Capuz cobrindo a cabeça
+        ctx.beginPath();
+        ctx.arc(cx, y + 8, 9, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
     // Braços (segurando o guidão)
-    ctx.fillStyle = '#00b894';
+    ctx.fillStyle = corRoupa;
     ctx.fillRect(cx - 14, y + 14, 7, 4);  // Braço esquerdo
     ctx.fillRect(cx + 7, y + 14, 7, 4);   // Braço direito
 
-    // Capacete do Alex (vermelho de entregador)
-    ctx.fillStyle = '#e94560';
+    // Capacete do Alex (vermelho, aparece por cima do capuz)
+    ctx.fillStyle = estaChovendo ? '#333' : '#e94560';
     ctx.beginPath();
     ctx.arc(cx, y + 8, 7, 0, Math.PI * 2);
     ctx.fill();
     // Viseira do capacete
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = estaChovendo ? '#111' : '#333';
     ctx.beginPath();
     ctx.arc(cx, y + 9, 5, -0.5, Math.PI + 0.5);
     ctx.fill();
