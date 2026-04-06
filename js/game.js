@@ -71,18 +71,17 @@ function ajustarCanvas() {
 
     if (larguraTela <= 650) {
         // ---------- MOBILE ----------
-        // O canvas interno continua 800x600, mas visualmente
-        // é encolhido via CSS para caber na tela.
-        // O navegador escala automaticamente (como uma imagem).
+        // O canvas ocupa TODA a tela disponível (abaixo do HUD).
+        // Os controles ficam por cima do jogo (overlay), sem roubar espaço.
         let alturaTela = window.innerHeight;
 
-        // Espaço disponível: tela menos HUD (~40px) e controles (~125px)
-        let alturaDisponivel = alturaTela - 165;
+        // Espaço: tela toda menos o HUD no topo (~55px)
+        let alturaDisponivel = alturaTela - 55;
 
-        // Calcula qual dimensão limita (largura ou altura)
+        // Escala para preencher a tela toda
         let escalaLargura = larguraTela / LARGURA_CANVAS;
         let escalaAltura = alturaDisponivel / ALTURA_CANVAS;
-        let escala = Math.min(escalaLargura, escalaAltura);
+        let escala = Math.max(escalaLargura, escalaAltura); // max = preenche tudo
 
         canvas.style.width = Math.floor(LARGURA_CANVAS * escala) + 'px';
         canvas.style.height = Math.floor(ALTURA_CANVAS * escala) + 'px';

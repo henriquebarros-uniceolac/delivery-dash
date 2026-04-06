@@ -321,13 +321,17 @@ button:hover {
         overflow: hidden;
     }
 
-    /* HUD compacto no topo */
+    /* HUD compacto no topo - fixo acima do jogo */
     #hud {
-        position: relative;
-        font-size: 0.7em;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        font-size: 0.75em;
         flex-wrap: nowrap;
         gap: 2px;
-        padding: 6px 5px;
+        padding: 8px 5px;
+        z-index: 15;
     }
 
     .hud-item {
@@ -337,25 +341,28 @@ button:hover {
         font-size: 0.95em;
     }
 
-    /* Canvas: tamanho controlado pelo JS (ajustarCanvas) */
+    /* Canvas: ocupa tela toda abaixo do HUD */
     #canvas-jogo {
         border: none;
+        margin-top: 50px;
     }
 
-    /* Mostra controles touch */
+    /* Controles: OVERLAY por cima do jogo (não rouba espaço) */
     #controles-mobile {
         display: block;
-        position: relative;
-        bottom: auto;
-        left: auto;
-        transform: none;
-        margin-top: 5px;
+        position: fixed;
+        bottom: 25px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 30;
+        opacity: 0.7; /* Semitransparente pra ver o jogo por trás */
     }
 
+    /* Botões maiores e fáceis de tocar */
     .btn-direcao {
-        width: 50px;
-        height: 50px;
-        font-size: 1.3em;
+        width: 65px;
+        height: 65px;
+        font-size: 1.8em;
     }
 
     /* Mensagem menor */
