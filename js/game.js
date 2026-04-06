@@ -78,13 +78,12 @@ function ajustarCanvas() {
         // Espaço: tela toda menos o HUD no topo (~55px)
         let alturaDisponivel = alturaTela - 55;
 
-        // Escala para CABER na tela (min = mostra tudo, não corta nada)
-        let escalaLargura = larguraTela / LARGURA_CANVAS;
-        let escalaAltura = alturaDisponivel / ALTURA_CANVAS;
-        let escala = Math.min(escalaLargura, escalaAltura);
+        // Escala pela LARGURA para preencher horizontalmente
+        // e depois estica a altura para preencher o espaço todo
+        let escala = larguraTela / LARGURA_CANVAS;
 
-        canvas.style.width = Math.floor(LARGURA_CANVAS * escala) + 'px';
-        canvas.style.height = Math.floor(ALTURA_CANVAS * escala) + 'px';
+        canvas.style.width = larguraTela + 'px';
+        canvas.style.height = alturaDisponivel + 'px';
     } else {
         // ---------- DESKTOP ----------
         // Sem escala, tamanho natural

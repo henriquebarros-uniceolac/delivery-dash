@@ -344,7 +344,9 @@ button:hover {
     /* Canvas: ocupa tela toda abaixo do HUD */
     #canvas-jogo {
         border: none;
-        margin-top: 50px;
+        position: fixed;
+        top: 50px;
+        left: 0;
     }
 
     /* Controles: OVERLAY por cima do jogo (não rouba espaço) */
