@@ -32,6 +32,51 @@ let animacaoFrame;    // Referência do requestAnimationFrame
 let offsetEstrada = 0; // Para animar as faixas da estrada
 
 /**
+ * ajustarCanvas()
+ * -----------------
+ * Adapta o tamanho do canvas ao dispositivo.
+ *
+ * No MOBILE: o canvas ocupa a largura da tela e a altura
+ * disponível (descontando HUD e controles).
+ *
+ * No DESKTOP: usa um tamanho fixo confortável.
+ *
+ * O truque é: o canvas tem um tamanho INTERNO (resolução lógica)
+ * e um tamanho VISUAL (CSS). O jogo desenha na resolução interna,
+ * e o CSS escala para o tamanho visual. Assim tudo fica proporcional.
+ */
+function ajustarCanvas() {
+    let larguraTela = window.innerWidth;
+    let alturaTela = window.innerHeight;
+
+    if (larguraTela <= 650) {
+        // ---------- MOBILE ----------
+        // Canvas ocupa toda a largura, com margem
+        let larguraDisponivel = larguraTela - 10;
+        // Altura: desconta HUD (50px) e controles (160px)
+        let alturaDisponivel = alturaTela - 210;
+
+        // Define resolução interna proporcional
+        LARGURA_CANVAS = 400;
+        ALTURA_CANVAS = Math.floor(400 * (alturaDisponivel / larguraDisponivel));
+
+        // Tamanho visual do canvas (CSS)
+        canvas.width = LARGURA_CANVAS;
+        canvas.height = ALTURA_CANVAS;
+        canvas.style.width = larguraDisponivel + 'px';
+        canvas.style.height = alturaDisponivel + 'px';
+    } else {
+        // ---------- DESKTOP ----------
+        LARGURA_CANVAS = 800;
+        ALTURA_CANVAS = 600;
+        canvas.width = LARGURA_CANVAS;
+        canvas.height = ALTURA_CANVAS;
+        canvas.style.width = '';
+        canvas.style.height = '';
+    }
+}
+
+/**
  * iniciarJogo()
  * ---------------
  * Chamada quando o jogador clica em "Começar Entrega!".
@@ -43,10 +88,9 @@ function iniciarJogo() {
     document.getElementById('tela-gameover').classList.add('escondido');
     document.getElementById('tela-jogo').classList.remove('escondido');
 
-    // Configura o canvas
+    // Configura o canvas com tamanho adaptado à tela
     canvas = document.getElementById('canvas-jogo');
-    canvas.width = LARGURA_CANVAS;
-    canvas.height = ALTURA_CANVAS;
+    ajustarCanvas();
     ctx = canvas.getContext('2d');
 
     // Reseta variáveis

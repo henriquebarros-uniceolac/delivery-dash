@@ -9,9 +9,12 @@
    ======================================== */
 
 // ---------- TAMANHO DO CANVAS ----------
-// Define a área jogável (em pixels)
-const LARGURA_CANVAS = 800;
-const ALTURA_CANVAS = 600;
+// Tamanho INTERNO do jogo (resolução lógica).
+// O canvas vai ser escalado visualmente para caber na tela,
+// mas internamente o jogo sempre usa esses valores.
+// Isso evita ter que recalcular posições para cada tela.
+let LARGURA_CANVAS = 400;
+let ALTURA_CANVAS = 600;
 
 // ---------- CONFIGURAÇÕES DO JOGADOR ----------
 const CONFIG_JOGADOR = {
