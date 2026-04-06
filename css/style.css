@@ -136,13 +136,10 @@ button:hover {
 }
 
 /* ---------- CANVAS DO JOGO ---------- */
-/* O canvas se adapta ao tamanho da tela no mobile */
 #canvas-jogo {
     display: block;
     border: 2px solid #333;
     background-color: #2d2d2d;
-    max-width: 100%;
-    max-height: 70vh;
 }
 
 /* ========================================
@@ -250,108 +247,139 @@ button:hover {
     font-weight: bold;
 }
 
-/* ---------- RESPONSIVIDADE ---------- */
-/* Ajustes para telas menores (celular/tablet) */
+/* ========================================
+   RESPONSIVIDADE MOBILE
+   ========================================
+   Tudo que muda no celular/tablet.
+   Usa max-width: 650px como breakpoint.
+   ======================================== */
 @media (max-width: 650px) {
 
-    /* Corpo ocupa tela toda sem scroll */
+    /* Corpo: ocupa tela toda, sem scroll */
     body {
-        height: 100dvh; /* dvh = altura real da viewport no mobile */
+        height: 100dvh;
+        height: 100vh; /* Fallback para navegadores sem dvh */
         overflow: hidden;
+        display: block; /* Remove o flex do desktop */
     }
 
-    /* Tela de jogo organizada em coluna */
-    #tela-jogo {
-        flex-direction: column;
-        align-items: center;
-        padding-top: 50px; /* Espaço para o HUD */
+    /* Telas: ocupam tudo e organizam em coluna */
+    .tela {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto; /* Permite scroll se necessário */
     }
 
     /* ---------- TELA INICIAL MOBILE ---------- */
     .container-inicio {
-        margin: 10px;
+        margin: 15px;
         padding: 15px;
-        max-height: 90dvh;
-        overflow-y: auto;
+        max-width: 95vw;
     }
 
     .container-inicio h1 {
-        font-size: 1.8em;
+        font-size: 1.6em;
     }
 
     .container-inicio h2 {
-        font-size: 1em;
+        font-size: 0.9em;
+        margin-bottom: 10px;
     }
 
     .historia {
-        font-size: 0.85em;
+        font-size: 0.8em;
         padding: 10px;
+        margin-bottom: 10px;
     }
 
     .instrucoes {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
+    }
+
+    .instrucoes h3 {
+        font-size: 0.95em;
     }
 
     .instrucoes p {
-        font-size: 0.85em;
+        font-size: 0.8em;
+        margin: 3px 0;
     }
 
-    /* ---------- HUD MOBILE ---------- */
+    button {
+        font-size: 0.95em;
+        padding: 10px 25px;
+    }
+
+    /* ---------- TELA DO JOGO MOBILE ---------- */
+    #tela-jogo {
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    /* HUD compacto no topo */
     #hud {
-        font-size: 0.75em;
+        position: relative;
+        font-size: 0.7em;
         flex-wrap: nowrap;
-        gap: 3px;
-        padding: 8px 5px;
+        gap: 2px;
+        padding: 6px 5px;
     }
 
     .hud-item {
         flex-direction: column;
         align-items: center;
         gap: 0;
+        font-size: 0.95em;
     }
 
-    /* ---------- BOTÕES MOBILE ---------- */
-    button {
-        font-size: 1em;
-        padding: 12px 30px;
-    }
-
-    /* ---------- CANVAS MOBILE ---------- */
+    /* Canvas: ocupa o espaço entre HUD e controles */
     #canvas-jogo {
-        max-width: calc(100vw - 10px);
+        width: 100vw !important;
+        height: auto !important;
+        max-height: none;
+        border: none;
     }
 
-    /* ---------- CONTROLES TOUCH ---------- */
-    /* Mostra os controles touch no mobile */
+    /* Mostra controles touch */
     #controles-mobile {
         display: block;
+        position: relative;
+        bottom: auto;
+        left: auto;
+        transform: none;
+        margin-top: 5px;
     }
 
-    /* Botões menores no mobile */
     .btn-direcao {
-        width: 55px;
-        height: 55px;
-        font-size: 1.5em;
+        width: 50px;
+        height: 50px;
+        font-size: 1.3em;
     }
 
-    /* ---------- MENSAGEM MOBILE ---------- */
+    /* Mensagem menor */
     #mensagem-entrega {
-        font-size: 0.85em;
-        padding: 8px 15px;
-        top: 55px;
+        font-size: 0.8em;
+        padding: 6px 12px;
+        top: 45px;
     }
 
     /* ---------- GAME OVER MOBILE ---------- */
     .container-gameover {
         margin: 15px;
-        padding: 25px;
+        padding: 20px;
     }
 
     .container-gameover h1 {
-        font-size: 1.8em;
+        font-size: 1.6em;
     }
 
     .resultado {
-        font-size: 1.1em;
+        font-size: 1em;
+        margin: 15px 0;
     }
 }

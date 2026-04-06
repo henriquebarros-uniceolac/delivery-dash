@@ -51,19 +51,24 @@ function ajustarCanvas() {
 
     if (larguraTela <= 650) {
         // ---------- MOBILE ----------
-        // Canvas ocupa toda a largura, com margem
-        let larguraDisponivel = larguraTela - 10;
-        // Altura: desconta HUD (50px) e controles (160px)
-        let alturaDisponivel = alturaTela - 210;
+        // O canvas usa a largura da tela como base
+        // e calcula a altura proporcional que cabe na tela
+        // descontando o HUD (~40px) e os controles (~120px)
 
-        // Define resolução interna proporcional
-        LARGURA_CANVAS = 400;
-        ALTURA_CANVAS = Math.floor(400 * (alturaDisponivel / larguraDisponivel));
+        let alturaDisponivel = alturaTela - 165;
 
-        // Tamanho visual do canvas (CSS)
+        // Resolução interna menor no mobile (melhor performance)
+        LARGURA_CANVAS = 300;
+        ALTURA_CANVAS = Math.floor(300 * (alturaDisponivel / larguraTela));
+
+        // Garante mínimo de altura
+        if (ALTURA_CANVAS < 300) ALTURA_CANVAS = 300;
+
         canvas.width = LARGURA_CANVAS;
         canvas.height = ALTURA_CANVAS;
-        canvas.style.width = larguraDisponivel + 'px';
+
+        // O CSS cuida do tamanho visual (100vw via media query)
+        canvas.style.width = '';
         canvas.style.height = alturaDisponivel + 'px';
     } else {
         // ---------- DESKTOP ----------
