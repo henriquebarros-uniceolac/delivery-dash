@@ -38,6 +38,10 @@ let timerCoracao = null;    // Timer para spawnar coração
 let tempoItem = null;        // Relógio de bônus na pista
 let tempoItemSpawnado = false; // Se já spawnou neste ciclo de alerta
 
+// ---------- PAUSA DO TIMER ----------
+let tempoPausado = false;     // Se o timer está pausado (após entrega)
+let framesPausa = 0;          // Contador de frames da pausa
+
 // ---------- EFEITOS VISUAIS ----------
 let cenarioAtual = null;    // Objeto com cores/efeitos do nível
 let gotasChuva = [];        // Array de gotas de chuva
@@ -140,6 +144,8 @@ function iniciarJogo() {
     // Reseta item de tempo
     tempoItem = null;
     tempoItemSpawnado = false;
+    tempoPausado = false;
+    framesPausa = 0;
 
     // Reseta efeitos visuais
     cenarioAtual = obterCenarioNivel(1);
@@ -173,6 +179,9 @@ function iniciarJogo() {
 
     // Inicia o timer (conta regressiva)
     timerIntervalo = setInterval(function() {
+        // Se o timer está pausado (após entrega), não decrementa
+        if (tempoPausado) return;
+
         tempoRestante--;
         document.getElementById('tempo').textContent = tempoRestante;
 
@@ -322,7 +331,13 @@ function loopPrincipal() {
         tempoRestante += bonus;
         totalEntregas++;
 
-        mostrarMensagem('✅ +' + CONFIG_ENTREGAS.pontosEntrega + ' pts | +' + bonus + 's');
+        // Pausa o timer por 3 segundos após entregar (respiro pro jogador)
+        tempoPausado = true;
+        setTimeout(function() {
+            tempoPausado = false;
+        }, 3000);
+
+        mostrarMensagem('✅ +' + CONFIG_ENTREGAS.pontosEntrega + ' pts | +' + bonus + 's | ⏸️ 3s');
 
         // Verifica se subiu de nível
         if (totalEntregas % CONFIG_DIFICULDADE.entregasPorNivel === 0) {
