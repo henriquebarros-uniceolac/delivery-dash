@@ -147,13 +147,17 @@ function moverJogador() {
         jogador.x += jogador.velocidade;
     }
 
-    // ---------- LIMITES DO CANVAS ----------
-    // Impede o jogador de sair da tela
-    if (jogador.x < 0) {
-        jogador.x = 0;
+    // ---------- LIMITES DA ESTRADA ----------
+    // Impede o jogador de sair da pista e entrar nas calçadas
+    // A calçada tem 130px de cada lado (onde ficam os prédios)
+    let limiteEsquerdo = 135;  // Margem da calçada esquerda
+    let limiteDireito = LARGURA_CANVAS - 135; // Margem da calçada direita
+
+    if (jogador.x < limiteEsquerdo) {
+        jogador.x = limiteEsquerdo;
     }
-    if (jogador.x + jogador.largura > LARGURA_CANVAS) {
-        jogador.x = LARGURA_CANVAS - jogador.largura;
+    if (jogador.x + jogador.largura > limiteDireito) {
+        jogador.x = limiteDireito - jogador.largura;
     }
     if (jogador.y < 50) { // 50px de margem pro HUD
         jogador.y = 50;

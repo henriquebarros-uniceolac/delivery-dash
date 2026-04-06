@@ -222,21 +222,24 @@ function loopPrincipal() {
  * As faixas se movem para dar sensação de velocidade.
  */
 function desenharCenario() {
-    // Grama (fundo)
+    // Largura das calçadas (onde ficam os prédios)
+    let larguraCalcada = 130;
+
+    // Grama (fundo verde de Brasília)
     ctx.fillStyle = CORES.grama;
     ctx.fillRect(0, 0, LARGURA_CANVAS, ALTURA_CANVAS);
 
-    // Calçadas laterais
-    ctx.fillStyle = CORES.calcada;
-    ctx.fillRect(0, 0, 60, ALTURA_CANVAS);
-    ctx.fillRect(LARGURA_CANVAS - 60, 0, 60, ALTURA_CANVAS);
+    // Calçadas laterais (concreto claro, estilo Esplanada)
+    ctx.fillStyle = '#c4b9a0';
+    ctx.fillRect(0, 0, larguraCalcada, ALTURA_CANVAS);
+    ctx.fillRect(LARGURA_CANVAS - larguraCalcada, 0, larguraCalcada, ALTURA_CANVAS);
 
-    // Estrada principal (asfalto)
+    // Estrada principal (asfalto do Eixo Monumental)
     ctx.fillStyle = CORES.estrada;
-    ctx.fillRect(60, 0, LARGURA_CANVAS - 120, ALTURA_CANVAS);
+    ctx.fillRect(larguraCalcada, 0, LARGURA_CANVAS - larguraCalcada * 2, ALTURA_CANVAS);
 
-    // Faixas brancas (animadas para dar sensação de movimento)
-    offsetEstrada += 2; // Velocidade da animação
+    // ========== FAIXAS DA ESTRADA ==========
+    offsetEstrada += 2;
     if (offsetEstrada > 60) offsetEstrada = 0;
 
     ctx.fillStyle = CORES.faixa;
@@ -244,35 +247,202 @@ function desenharCenario() {
     for (let y = -60 + offsetEstrada; y < ALTURA_CANVAS; y += 60) {
         ctx.fillRect(LARGURA_CANVAS / 2 - 2, y, 4, 30);
     }
-
     // Faixas laterais contínuas
-    ctx.fillRect(62, 0, 3, ALTURA_CANVAS);
-    ctx.fillRect(LARGURA_CANVAS - 65, 0, 3, ALTURA_CANVAS);
-
-    // Faixas de divisão das pistas
+    ctx.fillRect(larguraCalcada + 2, 0, 3, ALTURA_CANVAS);
+    ctx.fillRect(LARGURA_CANVAS - larguraCalcada - 5, 0, 3, ALTURA_CANVAS);
+    // Divisão de pistas
     for (let y = -60 + offsetEstrada; y < ALTURA_CANVAS; y += 60) {
-        ctx.fillRect(LARGURA_CANVAS / 4 + 30, y, 4, 30);
-        ctx.fillRect(LARGURA_CANVAS * 3 / 4 - 30, y, 4, 30);
+        ctx.fillRect(LARGURA_CANVAS * 0.35, y, 4, 30);
+        ctx.fillRect(LARGURA_CANVAS * 0.65, y, 4, 30);
     }
 
-    // Detalhes na calçada (postes/árvores)
-    ctx.fillStyle = '#4a7a2e';
-    for (let y = 50; y < ALTURA_CANVAS; y += 150) {
-        // Árvores na esquerda
+    // ========== ARQUITETURA DE BRASÍLIA ==========
+    // Prédios se movem junto com a estrada para dar sensação de velocidade
+    // Os monumentos se repetem nas laterais da Esplanada
+
+    // --- LADO ESQUERDO ---
+    desenharMinisterio(5, -40 + offsetEstrada * 2.5);       // Ministério 1
+    desenharCatedral(5, 140 + offsetEstrada * 2.5);          // Catedral
+    desenharMinisterio(5, 320 + offsetEstrada * 2.5);        // Ministério 2
+    desenharPalacio(5, 500 + offsetEstrada * 2.5);           // Palácio
+
+    // --- LADO DIREITO ---
+    desenharMinisterio(LARGURA_CANVAS - 125, -40 + offsetEstrada * 2.5);
+    desenharCongresso(LARGURA_CANVAS - 125, 140 + offsetEstrada * 2.5);
+    desenharMinisterio(LARGURA_CANVAS - 125, 320 + offsetEstrada * 2.5);
+    desenharPalacio(LARGURA_CANVAS - 125, 500 + offsetEstrada * 2.5);
+
+    // Arvorezinhas entre os prédios (jardim da Esplanada)
+    ctx.fillStyle = '#3d7a2e';
+    for (let y = -20 + offsetEstrada * 2.5; y < ALTURA_CANVAS + 100; y += 180) {
+        // Esquerda
         ctx.beginPath();
-        ctx.arc(30, y, 15, 0, Math.PI * 2);
+        ctx.arc(larguraCalcada - 15, y + 90, 8, 0, Math.PI * 2);
         ctx.fill();
-        // Árvores na direita
+        // Direita
         ctx.beginPath();
-        ctx.arc(LARGURA_CANVAS - 30, y, 15, 0, Math.PI * 2);
+        ctx.arc(LARGURA_CANVAS - larguraCalcada + 15, y + 90, 8, 0, Math.PI * 2);
         ctx.fill();
     }
-    // Troncos das árvores
-    ctx.fillStyle = '#5c3a1e';
-    for (let y = 50; y < ALTURA_CANVAS; y += 150) {
-        ctx.fillRect(28, y + 12, 4, 15);
-        ctx.fillRect(LARGURA_CANVAS - 32, y + 12, 4, 15);
+}
+
+/**
+ * desenharMinisterio(x, y)
+ * -------------------------
+ * Desenha um Ministério da Esplanada.
+ * Retângulo branco com colunas e janelas azuis,
+ * inspirado nos prédios do Oscar Niemeyer.
+ *
+ * @param {number} x - Posição horizontal
+ * @param {number} y - Posição vertical
+ */
+function desenharMinisterio(x, y) {
+    // Estrutura principal (concreto branco)
+    ctx.fillStyle = '#e8e0d0';
+    ctx.fillRect(x + 10, y, 100, 70);
+
+    // Pilotis (colunas de sustentação - marca do Niemeyer)
+    ctx.fillStyle = '#b0a89a';
+    for (let i = 0; i < 5; i++) {
+        ctx.fillRect(x + 15 + i * 22, y + 55, 4, 15);
     }
+
+    // Janelas azuis (vidro espelhado)
+    ctx.fillStyle = '#5a8faf';
+    for (let linha = 0; linha < 3; linha++) {
+        for (let col = 0; col < 6; col++) {
+            ctx.fillRect(x + 16 + col * 15, y + 5 + linha * 16, 10, 12);
+        }
+    }
+
+    // Sombra inferior
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.fillRect(x + 10, y + 65, 100, 5);
+}
+
+/**
+ * desenharCongresso(x, y)
+ * -------------------------
+ * Desenha o Congresso Nacional.
+ * Duas torres no centro + cúpula (Senado) e
+ * cúpula invertida (Câmara).
+ */
+function desenharCongresso(x, y) {
+    // Plataforma base
+    ctx.fillStyle = '#e8e0d0';
+    ctx.fillRect(x + 5, y + 40, 110, 30);
+
+    // Torres gêmeas (centro)
+    ctx.fillStyle = '#d0c8b8';
+    ctx.fillRect(x + 42, y, 12, 55);
+    ctx.fillRect(x + 62, y, 12, 55);
+
+    // Janelas das torres
+    ctx.fillStyle = '#5a8faf';
+    for (let i = 0; i < 5; i++) {
+        ctx.fillRect(x + 44, y + 4 + i * 10, 8, 6);
+        ctx.fillRect(x + 64, y + 4 + i * 10, 8, 6);
+    }
+
+    // Cúpula do Senado (lado direito - semicírculo para cima)
+    ctx.fillStyle = '#d0c8b8';
+    ctx.beginPath();
+    ctx.arc(x + 90, y + 42, 18, Math.PI, 0);
+    ctx.fill();
+
+    // Cúpula invertida da Câmara (lado esquerdo - semicírculo para baixo)
+    ctx.beginPath();
+    ctx.arc(x + 28, y + 38, 18, 0, Math.PI);
+    ctx.fill();
+
+    // Sombra
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.fillRect(x + 5, y + 65, 110, 5);
+}
+
+/**
+ * desenharCatedral(x, y)
+ * ------------------------
+ * Desenha a Catedral de Brasília.
+ * Estrutura com "costelas" curvas que se encontram
+ * no topo, com vitrais azuis entre elas.
+ */
+function desenharCatedral(x, y) {
+    // Base circular
+    ctx.fillStyle = '#d0c8b8';
+    ctx.beginPath();
+    ctx.ellipse(x + 60, y + 60, 45, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Costelas da catedral (linhas curvas)
+    ctx.strokeStyle = '#e8e0d0';
+    ctx.lineWidth = 3;
+    for (let i = 0; i < 8; i++) {
+        let angulo = (i / 8) * Math.PI * 2;
+        let baseX = x + 60 + Math.cos(angulo) * 35;
+        let baseY = y + 60 + Math.sin(angulo) * 8;
+        ctx.beginPath();
+        ctx.moveTo(baseX, baseY);
+        ctx.quadraticCurveTo(baseX, y + 15, x + 60, y + 5);
+        ctx.stroke();
+    }
+
+    // Vitrais (azul entre as costelas)
+    ctx.fillStyle = 'rgba(70, 150, 220, 0.5)';
+    ctx.beginPath();
+    ctx.moveTo(x + 25, y + 55);
+    ctx.quadraticCurveTo(x + 60, y - 5, x + 95, y + 55);
+    ctx.fill();
+
+    // Cruz no topo
+    ctx.fillStyle = '#c0a030';
+    ctx.fillRect(x + 58, y - 5, 4, 15);
+    ctx.fillRect(x + 54, y, 12, 3);
+}
+
+/**
+ * desenharPalacio(x, y)
+ * -----------------------
+ * Desenha o Palácio do Planalto / Palácio da Alvorada.
+ * Estrutura retangular com as famosas colunas em
+ * formato de "asas" (curvas características).
+ */
+function desenharPalacio(x, y) {
+    // Estrutura principal (vidro/concreto)
+    ctx.fillStyle = '#e8e0d0';
+    ctx.fillRect(x + 10, y + 15, 100, 45);
+
+    // Faixa de vidro
+    ctx.fillStyle = '#5a8faf';
+    ctx.fillRect(x + 15, y + 20, 90, 30);
+
+    // Reflexo no vidro
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.fillRect(x + 15, y + 20, 90, 10);
+
+    // Colunas em formato de asas (marca do Palácio da Alvorada)
+    ctx.strokeStyle = '#d0c8b8';
+    ctx.lineWidth = 3;
+    for (let i = 0; i < 6; i++) {
+        let colX = x + 18 + i * 18;
+        ctx.beginPath();
+        // Coluna curva: começa larga, afina e alarga de novo
+        ctx.moveTo(colX - 4, y + 60);
+        ctx.quadraticCurveTo(colX + 2, y + 30, colX - 2, y + 10);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(colX + 8, y + 60);
+        ctx.quadraticCurveTo(colX + 2, y + 30, colX + 6, y + 10);
+        ctx.stroke();
+    }
+
+    // Teto/marquise
+    ctx.fillStyle = '#d0c8b8';
+    ctx.fillRect(x + 5, y + 12, 110, 5);
+
+    // Sombra
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.fillRect(x + 10, y + 58, 100, 5);
 }
 
 /**

@@ -21,10 +21,12 @@ let destinoAtual = null;   // O local de entrega
  * Evita que apareça muito perto das bordas.
  */
 function criarPedido() {
-    let margem = 80; // Margem das bordas
+    // Pedido aparece só na estrada (entre as calçadas de 130px)
+    let xMin = 140;
+    let xMax = LARGURA_CANVAS - 170;
     pedidoAtual = {
-        x: margem + Math.random() * (LARGURA_CANVAS - margem * 2),
-        y: margem + Math.random() * (ALTURA_CANVAS - margem * 2 - 100),
+        x: xMin + Math.random() * (xMax - xMin),
+        y: 80 + Math.random() * (ALTURA_CANVAS - 200),
         largura: CONFIG_ENTREGAS.tamanhoPedido,
         altura: CONFIG_ENTREGAS.tamanhoPedido,
         coletado: false
@@ -44,10 +46,12 @@ function criarDestino() {
     let tentativas = 0;
 
     // Tenta criar um destino que não fique muito perto do jogador
+    let xMin = 140;
+    let xMax = LARGURA_CANVAS - 170;
     do {
         destinoAtual = {
-            x: margem + Math.random() * (LARGURA_CANVAS - margem * 2),
-            y: margem + Math.random() * (ALTURA_CANVAS - margem * 2 - 100),
+            x: xMin + Math.random() * (xMax - xMin),
+            y: 80 + Math.random() * (ALTURA_CANVAS - 200),
             largura: CONFIG_ENTREGAS.tamanhoDestino,
             altura: CONFIG_ENTREGAS.tamanhoDestino
         };
