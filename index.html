@@ -28,7 +28,7 @@
 
             <div class="instrucoes">
                 <h3>Como Jogar</h3>
-                <p>⬅️ ➡️ ⬆️ ⬇️ Setas do teclado para mover</p>
+                <p>⬅️ ➡️ ⬆️ ⬇️ Setas do teclado ou toque na tela (mobile)</p>
                 <p>📦 Colete os pedidos (caixas)</p>
                 <p>🏠 Entregue no destino (marcador verde)</p>
                 <p>🚗 Desvie dos obstáculos!</p>
@@ -65,6 +65,19 @@
 
         <!-- Mensagem de entrega -->
         <div id="mensagem-entrega" class="escondido">📦 Pedido coletado! Vá até o destino 🏠</div>
+
+        <!-- ==================== CONTROLES MOBILE ==================== -->
+        <!-- Botões direcionais que aparecem apenas em telas touch (celular/tablet) -->
+        <div id="controles-mobile">
+            <div class="linha-controle">
+                <button class="btn-direcao" id="btn-cima" aria-label="Mover para cima">▲</button>
+            </div>
+            <div class="linha-controle">
+                <button class="btn-direcao" id="btn-esquerda" aria-label="Mover para esquerda">◄</button>
+                <button class="btn-direcao" id="btn-baixo" aria-label="Mover para baixo">▼</button>
+                <button class="btn-direcao" id="btn-direita" aria-label="Mover para direita">►</button>
+            </div>
+        </div>
     </div>
 
     <!-- ==================== TELA GAME OVER ==================== -->

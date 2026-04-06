@@ -64,6 +64,61 @@ function configurarTeclas() {
             teclas[evento.key] = false;
         }
     });
+
+    // ---------- CONTROLES MOBILE (TOUCH) ----------
+    // Configura os botões na tela para dispositivos touch
+    configurarControlesMobile();
+}
+
+/**
+ * configurarControlesMobile()
+ * -----------------------------
+ * Adiciona eventos de toque (touch) nos botões direcionais.
+ *
+ * Usa 'touchstart' e 'touchend' em vez de 'click' porque:
+ * - touchstart: detecta o toque imediatamente (sem delay)
+ * - touchend: detecta quando o dedo sai do botão
+ * - click tem um delay de ~300ms no mobile
+ *
+ * Também usa preventDefault() para evitar que o navegador
+ * interprete o toque como scroll ou zoom.
+ */
+function configurarControlesMobile() {
+    // Mapeamento: ID do botão → tecla correspondente
+    let botoes = {
+        'btn-cima': 'ArrowUp',
+        'btn-baixo': 'ArrowDown',
+        'btn-esquerda': 'ArrowLeft',
+        'btn-direita': 'ArrowRight'
+    };
+
+    // Para cada botão, adiciona os eventos de toque
+    for (let idBotao in botoes) {
+        let elemento = document.getElementById(idBotao);
+        let teclaMapeada = botoes[idBotao];
+
+        if (!elemento) continue; // Segurança: pula se o botão não existir
+
+        // Quando TOCA no botão → ativa a tecla
+        elemento.addEventListener('touchstart', function(evento) {
+            evento.preventDefault(); // Evita scroll/zoom
+            teclas[teclaMapeada] = true;
+            elemento.classList.add('pressionado'); // Efeito visual
+        });
+
+        // Quando SOLTA o botão → desativa a tecla
+        elemento.addEventListener('touchend', function(evento) {
+            evento.preventDefault();
+            teclas[teclaMapeada] = false;
+            elemento.classList.remove('pressionado');
+        });
+
+        // Quando o dedo SAI do botão (arrasta pra fora) → desativa
+        elemento.addEventListener('touchcancel', function(evento) {
+            teclas[teclaMapeada] = false;
+            elemento.classList.remove('pressionado');
+        });
+    }
 }
 
 /**

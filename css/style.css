@@ -136,10 +136,65 @@ button:hover {
 }
 
 /* ---------- CANVAS DO JOGO ---------- */
+/* O canvas se adapta ao tamanho da tela no mobile */
 #canvas-jogo {
     display: block;
     border: 2px solid #333;
     background-color: #2d2d2d;
+    max-width: 100%;
+    max-height: 70vh;
+}
+
+/* ========================================
+   CONTROLES MOBILE (TOUCH)
+   ========================================
+   Botões direcionais que aparecem apenas em
+   dispositivos com tela touch (celular/tablet).
+   Ficam posicionados na parte inferior da tela.
+   ======================================== */
+
+/* Container dos controles - escondido por padrão no desktop */
+#controles-mobile {
+    display: none; /* Aparece só no mobile via media query */
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    user-select: none; /* Impede seleção de texto ao tocar */
+    -webkit-user-select: none;
+}
+
+/* Linhas do D-pad (organiza os botões) */
+.linha-controle {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* Cada botão direcional */
+.btn-direcao {
+    width: 65px;
+    height: 65px;
+    font-size: 1.8em;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent; /* Remove highlight azul no iOS */
+    touch-action: manipulation; /* Evita zoom ao tocar rápido */
+}
+
+/* Efeito visual quando o botão está sendo pressionado */
+.btn-direcao:active,
+.btn-direcao.pressionado {
+    background: rgba(233, 69, 96, 0.6);
+    border-color: #e94560;
+    transform: scale(0.95);
 }
 
 /* ---------- MENSAGEM DE ENTREGA ---------- */
@@ -196,7 +251,7 @@ button:hover {
 }
 
 /* ---------- RESPONSIVIDADE ---------- */
-/* Ajustes para telas menores */
+/* Ajustes para telas menores (celular/tablet) */
 @media (max-width: 650px) {
     .container-inicio {
         margin: 10px;
@@ -216,5 +271,15 @@ button:hover {
     button {
         font-size: 1em;
         padding: 12px 30px;
+    }
+
+    /* Mostra os controles touch no mobile */
+    #controles-mobile {
+        display: block;
+    }
+
+    /* Reduz o canvas para caber com os controles */
+    #canvas-jogo {
+        max-height: 55vh;
     }
 }
