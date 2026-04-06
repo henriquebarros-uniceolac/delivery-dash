@@ -138,32 +138,32 @@ function obterCenarioNivel(nivel) {
             escuridao: 0.1
         };
     } else if (nivel <= 6) {
-        // NOITE
+        // NOITE (clareada — dá pra enxergar bem)
         return {
             nome: 'Noite',
-            grama: '#0d2a0e',
-            calcada: '#4a4a3a',
-            estrada: '#1a1a1a',
-            faixa: '#999999',
-            ceu: '#0a0a2a',
+            grama: '#1a3a15',
+            calcada: '#5a5a4a',
+            estrada: '#2a2a2a',
+            faixa: '#aaaaaa',
+            ceu: '#151535',
             chuva: false,
             neblina: false,
             relampago: false,
-            escuridao: 0.35
+            escuridao: 0.2
         };
     } else if (nivel <= 8) {
         // NOITE COM CHUVA
         return {
             nome: 'Chuva Noturna',
-            grama: '#0d2a0e',
-            calcada: '#3a3a2a',
-            estrada: '#151515',
-            faixa: '#777777',
-            ceu: '#050520',
+            grama: '#1a3a15',
+            calcada: '#4a4a3a',
+            estrada: '#222222',
+            faixa: '#888888',
+            ceu: '#101030',
             chuva: true,
             neblina: false,
             relampago: false,
-            escuridao: 0.4
+            escuridao: 0.25
         };
     } else if (nivel <= 10) {
         // AMANHECENDO COM NEBLINA
@@ -183,15 +183,15 @@ function obterCenarioNivel(nivel) {
         // TEMPESTADE (nível 11+)
         return {
             nome: 'Tempestade',
-            grama: '#0a1a0a',
-            calcada: '#2a2a2a',
-            estrada: '#111111',
-            faixa: '#666666',
-            ceu: '#030315',
+            grama: '#152015',
+            calcada: '#353535',
+            estrada: '#1a1a1a',
+            faixa: '#777777',
+            ceu: '#0a0a25',
             chuva: true,
             neblina: true,
             relampago: true,
-            escuridao: 0.45
+            escuridao: 0.3
         };
     }
 }
