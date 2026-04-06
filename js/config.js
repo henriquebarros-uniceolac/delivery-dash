@@ -19,10 +19,10 @@ const ALTURA_CANVAS = 600;
 
 // ---------- CONFIGURAÇÕES DO JOGADOR ----------
 const CONFIG_JOGADOR = {
-    largura: 40,       // Largura do sprite do jogador
-    altura: 50,        // Altura do sprite do jogador
+    largura: 32,       // Largura do sprite (moto é mais estreita que carro)
+    altura: 55,        // Altura do sprite (moto é comprida)
     velocidade: 5,     // Velocidade de movimento (pixels por frame)
-    cor: '#00d4ff'     // Cor principal do jogador
+    cor: '#e94560'     // Cor principal da moto
 };
 
 // ---------- CONFIGURAÇÕES DO TEMPO ----------

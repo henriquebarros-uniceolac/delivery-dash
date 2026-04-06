@@ -176,37 +176,96 @@ function moverJogador() {
  * @param {CanvasRenderingContext2D} ctx - Contexto do canvas
  */
 function desenharJogador(ctx) {
-    // Corpo da moto (retângulo principal)
-    ctx.fillStyle = CORES.jogador;
-    ctx.fillRect(jogador.x, jogador.y, jogador.largura, jogador.altura);
+    let cx = jogador.x + jogador.largura / 2; // Centro X do jogador
+    let x = jogador.x;
+    let y = jogador.y;
+    let larg = jogador.largura;
+    let alt = jogador.altura;
 
-    // Guidão (linha no topo)
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(jogador.x - 5, jogador.y + 5, jogador.largura + 10, 4);
+    // ===== MOTO (visão de cima) =====
 
-    // Rodas (dois círculos)
-    ctx.fillStyle = '#333333';
+    // Roda traseira
+    ctx.fillStyle = '#1a1a1a';
     ctx.beginPath();
-    ctx.arc(jogador.x + 8, jogador.y + jogador.altura - 3, 6, 0, Math.PI * 2);
+    ctx.ellipse(cx, y + alt - 4, 8, 5, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.beginPath();
-    ctx.arc(jogador.x + jogador.largura - 8, jogador.y + jogador.altura - 3, 6, 0, Math.PI * 2);
-    ctx.fill();
+    // Aro da roda traseira
+    ctx.strokeStyle = '#555';
+    ctx.lineWidth = 1;
+    ctx.stroke();
 
-    // Indicador de pedido (se está carregando)
-    if (jogador.carregando) {
-        ctx.fillStyle = CORES.pedido;
-        ctx.fillRect(jogador.x + 10, jogador.y - 15, 20, 15);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '10px Arial';
-        ctx.fillText('📦', jogador.x + 11, jogador.y - 3);
-    }
-
-    // Capacete do Alex (circulo no topo)
+    // Corpo da moto (chassi fino e comprido)
     ctx.fillStyle = '#e94560';
     ctx.beginPath();
-    ctx.arc(jogador.x + jogador.largura / 2, jogador.y + 12, 10, 0, Math.PI * 2);
+    ctx.moveTo(cx - 6, y + alt - 8);  // Traseira esquerda
+    ctx.lineTo(cx + 6, y + alt - 8);  // Traseira direita
+    ctx.lineTo(cx + 5, y + 18);       // Frente direita
+    ctx.lineTo(cx - 5, y + 18);       // Frente esquerda
+    ctx.closePath();
     ctx.fill();
+
+    // Assento (onde o Alex senta)
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(cx - 5, y + 28, 10, 10);
+
+    // Tanque de combustível
+    ctx.fillStyle = '#c81d4e';
+    ctx.beginPath();
+    ctx.ellipse(cx, y + 22, 6, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ===== ALEX (o entregador) =====
+
+    // Corpo do Alex (jaqueta de entregador)
+    ctx.fillStyle = '#00b894';
+    ctx.fillRect(cx - 8, y + 12, 16, 14);
+
+    // Braços (segurando o guidão)
+    ctx.fillStyle = '#00b894';
+    ctx.fillRect(cx - 14, y + 14, 7, 4);  // Braço esquerdo
+    ctx.fillRect(cx + 7, y + 14, 7, 4);   // Braço direito
+
+    // Capacete do Alex (vermelho de entregador)
+    ctx.fillStyle = '#e94560';
+    ctx.beginPath();
+    ctx.arc(cx, y + 8, 7, 0, Math.PI * 2);
+    ctx.fill();
+    // Viseira do capacete
+    ctx.fillStyle = '#333';
+    ctx.beginPath();
+    ctx.arc(cx, y + 9, 5, -0.5, Math.PI + 0.5);
+    ctx.fill();
+
+    // Guidão
+    ctx.fillStyle = '#888';
+    ctx.fillRect(cx - 15, y + 16, 30, 3);
+    // Punhos
+    ctx.fillStyle = '#333';
+    ctx.fillRect(cx - 16, y + 15, 4, 5);
+    ctx.fillRect(cx + 12, y + 15, 4, 5);
+
+    // Roda dianteira
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.ellipse(cx, y + 4, 6, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#555';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // ===== BAG DE ENTREGA (se carregando pedido) =====
+    if (jogador.carregando) {
+        // Mochila/bag nas costas do Alex
+        ctx.fillStyle = CORES.pedido;
+        ctx.fillRect(cx - 10, y + 24, 20, 16);
+        // Detalhe da bag
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(cx - 6, y + 27, 12, 2);
+        ctx.font = 'bold 9px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('iFood', cx, y + 38);
+        ctx.textAlign = 'start';
+    }
 }
 
 /**
