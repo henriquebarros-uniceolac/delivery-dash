@@ -25,8 +25,11 @@ const CONFIG_JOGADOR = {
 
 // ---------- CONFIGURAÇÕES DO TEMPO ----------
 const CONFIG_TEMPO = {
-    inicial: 35,       // Tempo inicial em segundos
-    bonusEntrega: 3    // Segundos extras por entrega concluída
+    inicial: 35,         // Tempo inicial em segundos
+    bonusEntrega: 10,    // Segundos extras por entrega concluída
+    alertaSegundos: 10,  // Quando faltar esse tempo, spawna bônus na pista
+    bonusItemMin: 8,     // Mínimo de segundos do item de tempo
+    bonusItemMax: 10     // Máximo de segundos do item de tempo
 };
 
 // ---------- CONFIGURAÇÕES DE VIDAS ----------

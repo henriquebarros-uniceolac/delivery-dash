@@ -34,6 +34,10 @@ let framesInvencivel = 0;   // Contador de invencibilidade (pisca após dano)
 let coracaoItem = null;     // Coração de recuperação na pista
 let timerCoracao = null;    // Timer para spawnar coração
 
+// ---------- ITEM DE TEMPO ----------
+let tempoItem = null;        // Relógio de bônus na pista
+let tempoItemSpawnado = false; // Se já spawnou neste ciclo de alerta
+
 // ---------- EFEITOS VISUAIS ----------
 let cenarioAtual = null;    // Objeto com cores/efeitos do nível
 let gotasChuva = [];        // Array de gotas de chuva
@@ -133,6 +137,10 @@ function iniciarJogo() {
     coracaoItem = null;
     if (timerCoracao) clearTimeout(timerCoracao);
 
+    // Reseta item de tempo
+    tempoItem = null;
+    tempoItemSpawnado = false;
+
     // Reseta efeitos visuais
     cenarioAtual = obterCenarioNivel(1);
     gotasChuva = [];
@@ -167,6 +175,28 @@ function iniciarJogo() {
     timerIntervalo = setInterval(function() {
         tempoRestante--;
         document.getElementById('tempo').textContent = tempoRestante;
+
+        // Quando faltar poucos segundos, spawna um item de tempo na pista
+        if (tempoRestante <= CONFIG_TEMPO.alertaSegundos && !tempoItemSpawnado && !tempoItem) {
+            tempoItemSpawnado = true;
+            // Cria relógio na estrada
+            tempoItem = {
+                x: 140 + Math.random() * (LARGURA_CANVAS - 280),
+                y: 80 + Math.random() * (ALTURA_CANVAS - 250),
+                largura: 30,
+                altura: 30,
+                // Valor aleatório entre min e max
+                valor: CONFIG_TEMPO.bonusItemMin + Math.floor(
+                    Math.random() * (CONFIG_TEMPO.bonusItemMax - CONFIG_TEMPO.bonusItemMin + 1)
+                )
+            };
+            mostrarMensagem('⏱️ Relógio apareceu! Corra até ele!');
+        }
+
+        // Reseta o flag quando o tempo volta acima do alerta (pegou entrega)
+        if (tempoRestante > CONFIG_TEMPO.alertaSegundos) {
+            tempoItemSpawnado = false;
+        }
 
         // Tempo acabou = Game Over
         if (tempoRestante <= 0) {
@@ -267,7 +297,18 @@ function loopPrincipal() {
         }
     }
 
-    // 9. Verifica entregas
+    // 9. Desenha e verifica item de tempo
+    if (tempoItem) {
+        desenharTempoItem(ctx);
+        if (verificarColisao(jogador, tempoItem)) {
+            tempoRestante += tempoItem.valor;
+            mostrarMensagem('⏱️ +' + tempoItem.valor + ' segundos!');
+            tempoItem = null;
+            tempoItemSpawnado = false;
+        }
+    }
+
+    // 10. Verifica entregas
     let resultadoEntrega = verificarEntregas();
 
     if (resultadoEntrega.coletou) {
@@ -277,10 +318,11 @@ function loopPrincipal() {
     if (resultadoEntrega.entregou) {
         // Entrega concluída!
         pontuacao += CONFIG_ENTREGAS.pontosEntrega;
-        tempoRestante += CONFIG_TEMPO.bonusEntrega;
+        let bonus = CONFIG_TEMPO.bonusEntrega;
+        tempoRestante += bonus;
         totalEntregas++;
 
-        mostrarMensagem('✅ +' + CONFIG_ENTREGAS.pontosEntrega + ' pts | +' + CONFIG_TEMPO.bonusEntrega + 's');
+        mostrarMensagem('✅ +' + CONFIG_ENTREGAS.pontosEntrega + ' pts | +' + bonus + 's');
 
         // Verifica se subiu de nível
         if (totalEntregas % CONFIG_DIFICULDADE.entregasPorNivel === 0) {
@@ -722,6 +764,61 @@ function desenharCoracao(ctx) {
     ctx.font = 'bold 9px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('+1', cx, cy + tamanho + 14);
+    ctx.textAlign = 'start';
+}
+
+// ========================================
+// ITEM DE TEMPO (RELÓGIO)
+// ========================================
+
+/**
+ * desenharTempoItem(ctx)
+ * ------------------------
+ * Desenha o relógio de bônus de tempo na pista.
+ * Pulsa em azul para chamar atenção.
+ */
+function desenharTempoItem(ctx) {
+    if (!tempoItem) return;
+
+    let pulso = Math.sin(Date.now() / 150) * 3;
+    let cx = tempoItem.x + tempoItem.largura / 2;
+    let cy = tempoItem.y + tempoItem.altura / 2;
+    let raio = 14 + pulso;
+
+    // Brilho atrás
+    ctx.fillStyle = 'rgba(52, 152, 219, 0.3)';
+    ctx.beginPath();
+    ctx.arc(cx, cy, raio + 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Círculo do relógio
+    ctx.fillStyle = '#3498db';
+    ctx.beginPath();
+    ctx.arc(cx, cy, raio, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Borda branca
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Ponteiros do relógio
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx, cy - raio * 0.6);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + raio * 0.4, cy);
+    ctx.stroke();
+
+    // Texto com valor
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('+' + tempoItem.valor + 's', cx, cy + raio + 14);
     ctx.textAlign = 'start';
 }
 
