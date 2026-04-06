@@ -239,7 +239,7 @@ function desenharCenario() {
     ctx.fillRect(larguraCalcada, 0, LARGURA_CANVAS - larguraCalcada * 2, ALTURA_CANVAS);
 
     // ========== FAIXAS DA ESTRADA ==========
-    offsetEstrada += 2;
+    offsetEstrada += 0.5; // Velocidade suave (era 2, agora 0.5)
     if (offsetEstrada > 60) offsetEstrada = 0;
 
     ctx.fillStyle = CORES.faixa;
@@ -261,20 +261,20 @@ function desenharCenario() {
     // Os monumentos se repetem nas laterais da Esplanada
 
     // --- LADO ESQUERDO ---
-    desenharMinisterio(5, -40 + offsetEstrada * 2.5);       // Ministério 1
-    desenharCatedral(5, 140 + offsetEstrada * 2.5);          // Catedral
-    desenharMinisterio(5, 320 + offsetEstrada * 2.5);        // Ministério 2
-    desenharPalacio(5, 500 + offsetEstrada * 2.5);           // Palácio
+    desenharMinisterio(5, -40 + offsetEstrada * 0.8);       // Ministério 1
+    desenharCatedral(5, 140 + offsetEstrada * 0.8);          // Catedral
+    desenharMinisterio(5, 320 + offsetEstrada * 0.8);        // Ministério 2
+    desenharPalacio(5, 500 + offsetEstrada * 0.8);           // Palácio
 
     // --- LADO DIREITO ---
-    desenharMinisterio(LARGURA_CANVAS - 125, -40 + offsetEstrada * 2.5);
-    desenharCongresso(LARGURA_CANVAS - 125, 140 + offsetEstrada * 2.5);
-    desenharMinisterio(LARGURA_CANVAS - 125, 320 + offsetEstrada * 2.5);
-    desenharPalacio(LARGURA_CANVAS - 125, 500 + offsetEstrada * 2.5);
+    desenharMinisterio(LARGURA_CANVAS - 125, -40 + offsetEstrada * 0.8);
+    desenharCongresso(LARGURA_CANVAS - 125, 140 + offsetEstrada * 0.8);
+    desenharMinisterio(LARGURA_CANVAS - 125, 320 + offsetEstrada * 0.8);
+    desenharPalacio(LARGURA_CANVAS - 125, 500 + offsetEstrada * 0.8);
 
     // Arvorezinhas entre os prédios (jardim da Esplanada)
     ctx.fillStyle = '#3d7a2e';
-    for (let y = -20 + offsetEstrada * 2.5; y < ALTURA_CANVAS + 100; y += 180) {
+    for (let y = -20 + offsetEstrada * 0.8; y < ALTURA_CANVAS + 100; y += 180) {
         // Esquerda
         ctx.beginPath();
         ctx.arc(larguraCalcada - 15, y + 90, 8, 0, Math.PI * 2);
