@@ -31,6 +31,23 @@ let animacaoFrame;    // Referência do requestAnimationFrame
 // Variáveis para o efeito da estrada
 let offsetEstrada = 0; // Para animar as faixas da estrada
 
+// ---------- PRÉDIOS DE BRASÍLIA ----------
+// Cada prédio tem um tipo fixo e uma posição Y que desce pela tela.
+// Quando sai por baixo, volta ao topo mantendo o mesmo tipo.
+let prediosEsquerda = [
+    { tipo: 'ministerio', y: 0 },
+    { tipo: 'catedral',   y: 180 },
+    { tipo: 'ministerio', y: 360 },
+    { tipo: 'palacio',    y: 540 }
+];
+let prediosDireita = [
+    { tipo: 'ministerio', y: 0 },
+    { tipo: 'congresso',  y: 180 },
+    { tipo: 'ministerio', y: 360 },
+    { tipo: 'palacio',    y: 540 }
+];
+let velocidadePredios = 1.5; // Velocidade que os prédios descem
+
 /**
  * ajustarCanvas()
  * -----------------
@@ -239,7 +256,7 @@ function desenharCenario() {
     ctx.fillRect(larguraCalcada, 0, LARGURA_CANVAS - larguraCalcada * 2, ALTURA_CANVAS);
 
     // ========== FAIXAS DA ESTRADA ==========
-    offsetEstrada += 0.5; // Velocidade suave (era 2, agora 0.5)
+    offsetEstrada += 1.5; // Velocidade das faixas da estrada
     if (offsetEstrada > 60) offsetEstrada = 0;
 
     ctx.fillStyle = CORES.faixa;
@@ -257,33 +274,60 @@ function desenharCenario() {
     }
 
     // ========== ARQUITETURA DE BRASÍLIA ==========
-    // Prédios se movem junto com a estrada para dar sensação de velocidade
-    // Os monumentos se repetem nas laterais da Esplanada
+    // Cada prédio desce pela tela (simula o jogador passando por eles).
+    // Quando sai por baixo, volta ao topo. O tipo nunca muda.
 
-    // --- LADO ESQUERDO ---
-    desenharMinisterio(5, -40 + offsetEstrada * 0.8);       // Ministério 1
-    desenharCatedral(5, 140 + offsetEstrada * 0.8);          // Catedral
-    desenharMinisterio(5, 320 + offsetEstrada * 0.8);        // Ministério 2
-    desenharPalacio(5, 500 + offsetEstrada * 0.8);           // Palácio
+    // Move e desenha os prédios do lado ESQUERDO
+    let xEsq = 5;
+    for (let i = 0; i < prediosEsquerda.length; i++) {
+        let p = prediosEsquerda[i];
+        p.y += velocidadePredios;
+        // Se saiu por baixo, volta ao topo
+        if (p.y > ALTURA_CANVAS) {
+            p.y = -100;
+        }
+        desenharPredio(p.tipo, xEsq, p.y);
+    }
 
-    // --- LADO DIREITO ---
-    desenharMinisterio(LARGURA_CANVAS - 125, -40 + offsetEstrada * 0.8);
-    desenharCongresso(LARGURA_CANVAS - 125, 140 + offsetEstrada * 0.8);
-    desenharMinisterio(LARGURA_CANVAS - 125, 320 + offsetEstrada * 0.8);
-    desenharPalacio(LARGURA_CANVAS - 125, 500 + offsetEstrada * 0.8);
+    // Move e desenha os prédios do lado DIREITO
+    let xDir = LARGURA_CANVAS - 125;
+    for (let i = 0; i < prediosDireita.length; i++) {
+        let p = prediosDireita[i];
+        p.y += velocidadePredios;
+        if (p.y > ALTURA_CANVAS) {
+            p.y = -100;
+        }
+        desenharPredio(p.tipo, xDir, p.y);
+    }
 
     // Arvorezinhas entre os prédios (jardim da Esplanada)
     ctx.fillStyle = '#3d7a2e';
-    for (let y = -20 + offsetEstrada * 0.8; y < ALTURA_CANVAS + 100; y += 180) {
-        // Esquerda
+    for (let i = 0; i < prediosEsquerda.length; i++) {
+        let yArvore = prediosEsquerda[i].y + 85;
         ctx.beginPath();
-        ctx.arc(larguraCalcada - 15, y + 90, 8, 0, Math.PI * 2);
+        ctx.arc(larguraCalcada - 15, yArvore, 8, 0, Math.PI * 2);
         ctx.fill();
-        // Direita
+        yArvore = prediosDireita[i].y + 85;
         ctx.beginPath();
-        ctx.arc(LARGURA_CANVAS - larguraCalcada + 15, y + 90, 8, 0, Math.PI * 2);
+        ctx.arc(LARGURA_CANVAS - larguraCalcada + 15, yArvore, 8, 0, Math.PI * 2);
         ctx.fill();
     }
+}
+
+/**
+ * desenharPredio(tipo, x, y)
+ * ---------------------------
+ * Desenha o prédio correto baseado no tipo.
+ *
+ * @param {string} tipo - 'ministerio', 'congresso', 'catedral' ou 'palacio'
+ * @param {number} x - Posição horizontal
+ * @param {number} y - Posição vertical
+ */
+function desenharPredio(tipo, x, y) {
+    if (tipo === 'ministerio') desenharMinisterio(x, y);
+    else if (tipo === 'congresso') desenharCongresso(x, y);
+    else if (tipo === 'catedral') desenharCatedral(x, y);
+    else if (tipo === 'palacio') desenharPalacio(x, y);
 }
 
 /**
