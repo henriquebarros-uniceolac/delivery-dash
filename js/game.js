@@ -42,6 +42,12 @@ let tempoItemSpawnado = false; // Se já spawnou neste ciclo de alerta
 let tempoPausado = false;     // Se o timer está pausado (após entrega)
 let framesPausa = 0;          // Contador de frames da pausa
 
+// ---------- PODER ESCUDO ----------
+let escudoItem = null;         // Item de escudo na pista
+let escudoAtivo = false;       // Se o poder está ativo
+let escudoFrames = 0;          // Frames restantes do escudo (6s = 360 frames)
+let timerEscudo = null;        // Timer para spawnar escudo
+
 // ---------- EFEITOS VISUAIS ----------
 let cenarioAtual = null;    // Objeto com cores/efeitos do nível
 let gotasChuva = [];        // Array de gotas de chuva
@@ -146,6 +152,23 @@ function iniciarJogo() {
     tempoItemSpawnado = false;
     tempoPausado = false;
     framesPausa = 0;
+
+    // Reseta escudo
+    escudoItem = null;
+    escudoAtivo = false;
+    escudoFrames = 0;
+    if (timerEscudo) clearInterval(timerEscudo);
+    // Escudo aparece a cada 25-40 segundos aleatoriamente
+    timerEscudo = setInterval(function() {
+        if (!jogoRodando || escudoItem || escudoAtivo) return;
+        escudoItem = {
+            x: 140 + Math.random() * (LARGURA_CANVAS - 280),
+            y: 80 + Math.random() * (ALTURA_CANVAS - 250),
+            largura: 30,
+            altura: 30
+        };
+        mostrarMensagem('🛡️ Escudo apareceu na pista!');
+    }, (25 + Math.random() * 15) * 1000);
 
     // Reseta efeitos visuais
     cenarioAtual = obterCenarioNivel(1);
@@ -263,9 +286,18 @@ function loopPrincipal() {
         desenharJogador(ctx);
     }
 
-    // 7. Verifica colisões com obstáculos
-    // Só toma dano se NÃO estiver invencível
-    if (framesInvencivel === 0 && verificarColisaoObstaculos()) {
+    // 7. Escudo: conta frames e desativa quando acabar
+    if (escudoAtivo) {
+        escudoFrames--;
+        if (escudoFrames <= 0) {
+            escudoAtivo = false;
+            mostrarMensagem('🛡️ Escudo acabou!');
+        }
+    }
+
+    // 8. Verifica colisões com obstáculos
+    // Ignora se invencível OU se escudo ativo
+    if (framesInvencivel === 0 && !escudoAtivo && verificarColisaoObstaculos()) {
         vidas--;
 
         if (vidas <= 0) {
@@ -317,7 +349,39 @@ function loopPrincipal() {
         }
     }
 
-    // 10. Verifica entregas
+    // 10. Desenha e verifica escudo
+    if (escudoItem) {
+        desenharEscudoItem(ctx);
+        if (verificarColisao(jogador, escudoItem)) {
+            escudoAtivo = true;
+            escudoFrames = 360; // 6 segundos a 60fps
+            escudoItem = null;
+            mostrarMensagem('🛡️ ESCUDO ATIVADO! 6 segundos!');
+        }
+    }
+
+    // Aura do escudo ao redor do jogador quando ativo
+    if (escudoAtivo) {
+        let pulso = Math.sin(Date.now() / 100) * 3;
+        ctx.strokeStyle = 'rgba(0, 200, 255, 0.6)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(
+            jogador.x + jogador.largura / 2,
+            jogador.y + jogador.altura / 2,
+            jogador.largura / 2 + 10 + pulso,
+            jogador.altura / 2 + 10 + pulso,
+            0, 0, Math.PI * 2
+        );
+        ctx.stroke();
+
+        // Barra de duração do escudo (embaixo do jogador)
+        let porcentagem = escudoFrames / 360;
+        ctx.fillStyle = 'rgba(0, 200, 255, 0.5)';
+        ctx.fillRect(jogador.x - 5, jogador.y + jogador.altura + 5, (jogador.largura + 10) * porcentagem, 4);
+    }
+
+    // 11. Verifica entregas
     let resultadoEntrega = verificarEntregas();
 
     if (resultadoEntrega.coletou) {
@@ -690,6 +754,7 @@ function gameOver(motivo) {
     clearInterval(timerIntervalo);
     cancelAnimationFrame(animacaoFrame);
     if (timerCoracao) clearTimeout(timerCoracao);
+    if (timerEscudo) clearInterval(timerEscudo);
 
     // Mensagem diferente conforme o motivo
     if (motivo === 'vidas') {
@@ -779,6 +844,59 @@ function desenharCoracao(ctx) {
     ctx.font = 'bold 9px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('+1', cx, cy + tamanho + 14);
+    ctx.textAlign = 'start';
+}
+
+// ========================================
+// ITEM DE ESCUDO
+// ========================================
+
+/**
+ * desenharEscudoItem(ctx)
+ * -------------------------
+ * Desenha o item de escudo na pista.
+ * Estrela azul brilhante que pulsa.
+ */
+function desenharEscudoItem(ctx) {
+    if (!escudoItem) return;
+
+    let pulso = Math.sin(Date.now() / 150) * 3;
+    let cx = escudoItem.x + escudoItem.largura / 2;
+    let cy = escudoItem.y + escudoItem.altura / 2;
+    let raio = 14 + pulso;
+
+    // Brilho
+    ctx.fillStyle = 'rgba(0, 200, 255, 0.3)';
+    ctx.beginPath();
+    ctx.arc(cx, cy, raio + 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Escudo (forma de escudo)
+    ctx.fillStyle = '#00c8ff';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - raio);
+    ctx.lineTo(cx + raio, cy - raio * 0.3);
+    ctx.lineTo(cx + raio * 0.7, cy + raio * 0.8);
+    ctx.lineTo(cx, cy + raio);
+    ctx.lineTo(cx - raio * 0.7, cy + raio * 0.8);
+    ctx.lineTo(cx - raio, cy - raio * 0.3);
+    ctx.closePath();
+    ctx.fill();
+
+    // Borda
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Estrela no centro
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('★', cx, cy + 4);
+
+    // Texto
+    ctx.font = 'bold 9px Arial';
+    ctx.fillText('6s', cx, cy + raio + 14);
     ctx.textAlign = 'start';
 }
 
