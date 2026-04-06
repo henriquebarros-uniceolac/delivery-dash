@@ -337,11 +337,8 @@ button:hover {
         font-size: 0.95em;
     }
 
-    /* Canvas: ocupa o espaço entre HUD e controles */
+    /* Canvas: tamanho controlado pelo JS (ajustarCanvas) */
     #canvas-jogo {
-        width: 100vw !important;
-        height: auto !important;
-        max-height: none;
         border: none;
     }
 

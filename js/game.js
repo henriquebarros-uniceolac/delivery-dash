@@ -46,36 +46,32 @@ let offsetEstrada = 0; // Para animar as faixas da estrada
  * e o CSS escala para o tamanho visual. Assim tudo fica proporcional.
  */
 function ajustarCanvas() {
+    // A resolução interna é SEMPRE 800x600
+    canvas.width = LARGURA_CANVAS;
+    canvas.height = ALTURA_CANVAS;
+
     let larguraTela = window.innerWidth;
-    let alturaTela = window.innerHeight;
 
     if (larguraTela <= 650) {
         // ---------- MOBILE ----------
-        // O canvas usa a largura da tela como base
-        // e calcula a altura proporcional que cabe na tela
-        // descontando o HUD (~40px) e os controles (~120px)
+        // O canvas interno continua 800x600, mas visualmente
+        // é encolhido via CSS para caber na tela.
+        // O navegador escala automaticamente (como uma imagem).
+        let alturaTela = window.innerHeight;
 
+        // Espaço disponível: tela menos HUD (~40px) e controles (~125px)
         let alturaDisponivel = alturaTela - 165;
 
-        // Resolução interna menor no mobile (melhor performance)
-        LARGURA_CANVAS = 300;
-        ALTURA_CANVAS = Math.floor(300 * (alturaDisponivel / larguraTela));
+        // Calcula qual dimensão limita (largura ou altura)
+        let escalaLargura = larguraTela / LARGURA_CANVAS;
+        let escalaAltura = alturaDisponivel / ALTURA_CANVAS;
+        let escala = Math.min(escalaLargura, escalaAltura);
 
-        // Garante mínimo de altura
-        if (ALTURA_CANVAS < 300) ALTURA_CANVAS = 300;
-
-        canvas.width = LARGURA_CANVAS;
-        canvas.height = ALTURA_CANVAS;
-
-        // O CSS cuida do tamanho visual (100vw via media query)
-        canvas.style.width = '';
-        canvas.style.height = alturaDisponivel + 'px';
+        canvas.style.width = Math.floor(LARGURA_CANVAS * escala) + 'px';
+        canvas.style.height = Math.floor(ALTURA_CANVAS * escala) + 'px';
     } else {
         // ---------- DESKTOP ----------
-        LARGURA_CANVAS = 800;
-        ALTURA_CANVAS = 600;
-        canvas.width = LARGURA_CANVAS;
-        canvas.height = ALTURA_CANVAS;
+        // Sem escala, tamanho natural
         canvas.style.width = '';
         canvas.style.height = '';
     }

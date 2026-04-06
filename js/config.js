@@ -9,12 +9,13 @@
    ======================================== */
 
 // ---------- TAMANHO DO CANVAS ----------
-// Tamanho INTERNO do jogo (resolução lógica).
-// O canvas vai ser escalado visualmente para caber na tela,
-// mas internamente o jogo sempre usa esses valores.
-// Isso evita ter que recalcular posições para cada tela.
-let LARGURA_CANVAS = 400;
-let ALTURA_CANVAS = 600;
+// Resolução INTERNA fixa do jogo (nunca muda).
+// No mobile, o CSS escala visualmente para caber na tela,
+// mas o jogo SEMPRE usa 800x600 internamente.
+// Isso garante que obstáculos, jogador e pistas ficam
+// no tamanho correto em qualquer dispositivo.
+const LARGURA_CANVAS = 800;
+const ALTURA_CANVAS = 600;
 
 // ---------- CONFIGURAÇÕES DO JOGADOR ----------
 const CONFIG_JOGADOR = {
