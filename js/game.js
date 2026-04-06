@@ -158,17 +158,7 @@ function iniciarJogo() {
     escudoAtivo = false;
     escudoFrames = 0;
     if (timerEscudo) clearInterval(timerEscudo);
-    // Escudo aparece a cada 25-40 segundos aleatoriamente
-    timerEscudo = setInterval(function() {
-        if (!jogoRodando || escudoItem || escudoAtivo) return;
-        escudoItem = {
-            x: 140 + Math.random() * (LARGURA_CANVAS - 280),
-            y: 80 + Math.random() * (ALTURA_CANVAS - 250),
-            largura: 30,
-            altura: 30
-        };
-        mostrarMensagem('🛡️ Escudo apareceu na pista!');
-    }, (25 + Math.random() * 15) * 1000);
+    agendarEscudo();
 
     // Reseta efeitos visuais
     cenarioAtual = obterCenarioNivel(1);
@@ -292,6 +282,7 @@ function loopPrincipal() {
         if (escudoFrames <= 0) {
             escudoAtivo = false;
             mostrarMensagem('🛡️ Escudo acabou!');
+            agendarEscudo();
         }
     }
 
@@ -357,6 +348,7 @@ function loopPrincipal() {
             escudoFrames = 360; // 6 segundos a 60fps
             escudoItem = null;
             mostrarMensagem('🛡️ ESCUDO ATIVADO! 6 segundos!');
+            agendarEscudo(); // Agenda o próximo
         }
     }
 
@@ -848,7 +840,40 @@ function desenharCoracao(ctx) {
 }
 
 // ========================================
-// ITEM DE ESCUDO
+// SISTEMA DE ESCUDO
+// ========================================
+
+/**
+ * agendarEscudo()
+ * -----------------
+ * Agenda o próximo escudo para aparecer na pista.
+ * Primeiro aparece após 15s, depois a cada 20-30s.
+ */
+function agendarEscudo() {
+    if (timerEscudo) clearTimeout(timerEscudo);
+
+    // Primeiro escudo aparece após 15 segundos
+    // Os próximos a cada 20-30 segundos
+    let tempo = escudoFrames === 0 && !escudoAtivo ? 15000 : (20 + Math.random() * 10) * 1000;
+
+    timerEscudo = setTimeout(function() {
+        if (!jogoRodando || escudoItem || escudoAtivo) {
+            // Tenta de novo em 5 segundos
+            agendarEscudo();
+            return;
+        }
+        escudoItem = {
+            x: 140 + Math.random() * (LARGURA_CANVAS - 280),
+            y: 80 + Math.random() * (ALTURA_CANVAS - 250),
+            largura: 30,
+            altura: 30
+        };
+        mostrarMensagem('🛡️ Escudo apareceu na pista!');
+    }, tempo);
+}
+
+// ========================================
+// ITEM DE ESCUDO (DESENHO)
 // ========================================
 
 /**
