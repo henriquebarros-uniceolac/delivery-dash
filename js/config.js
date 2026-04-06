@@ -25,8 +25,8 @@ const CONFIG_JOGADOR = {
 
 // ---------- CONFIGURAÇÕES DO TEMPO ----------
 const CONFIG_TEMPO = {
-    inicial: 45,       // Tempo inicial em segundos (mais curto = mais pressão)
-    bonusEntrega: 7    // Segundos extras por entrega concluída (era 10)
+    inicial: 35,       // Tempo inicial em segundos
+    bonusEntrega: 3    // Segundos extras por entrega concluída
 };
 
 // ---------- CONFIGURAÇÕES DE VIDAS ----------
