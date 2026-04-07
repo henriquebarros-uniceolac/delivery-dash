@@ -171,11 +171,11 @@ function iniciarJogo() {
     ladroes = [];
     contadorEntregas = 0;
 
-    // Reseta BRT
+    // Reseta BRT (primeira aparição após 30 segundos)
     brtAtivo = false;
     brtOnibus = [];
     brtTempoRestante = 0;
-    brtProximoSpawn = 10800; // 3 minutos
+    brtProximoSpawn = 1800; // 30 segundos primeira vez
 
     // Reseta escudo
     escudoItem = null;
@@ -1157,7 +1157,7 @@ function atualizarBRT() {
         // Acabou os 20 segundos
         if (brtTempoRestante <= 0) {
             brtAtivo = false;
-            brtProximoSpawn = 10800; // Próxima em 3 minutos
+            brtProximoSpawn = 3600; // Próxima em 1 minuto
             mostrarMensagem('🚌 Faixa BRT liberada!');
         }
     } else {

@@ -170,10 +170,9 @@ function moverJogador() {
     }
 
     // ---------- LIMITES DA ESTRADA ----------
-    // Quando BRT está ativo, jogador pode entrar na faixa BRT
-    // Senão, fica limitado à pista normal
-    let limiteEsquerdo = brtAtivo ? 132 : 182;
-    let limiteDireito = brtAtivo ? LARGURA_CANVAS - 132 : LARGURA_CANVAS - 182;
+    // Jogador pode andar em toda a pista (entre as calçadas de 130px)
+    let limiteEsquerdo = 135;
+    let limiteDireito = LARGURA_CANVAS - 135;
 
     if (jogador.x < limiteEsquerdo) {
         jogador.x = limiteEsquerdo;
