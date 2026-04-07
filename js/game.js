@@ -1,6 +1,6 @@
 /* ========================================
-   GAME.JS - Loop Principal do Jogo
-   ========================================ß */
+   GAME.JS - Loop Principal do Jogo v2
+   ======================================== */
 
 // ---------- VARIÁVEIS DO JOGO ----------
 let canvas;
@@ -53,72 +53,20 @@ let frameRelampago = 0;
 // Variáveis para o efeito da estrada
 let offsetEstrada = 0;
 
-// ---------- PRÉDIOS / CASAS ----------
-let prediosEsquerda = [];
-let prediosDireita = [];
-let velocidadePredios = 1.5;
-let cidadeAtual = '';
-
-// Sistema de cidades do DF
-const CIDADES = [
-    { nome: 'Brasília',         nivelInicio: 1,  tipo: 'monumentos' },
-    { nome: 'Ceilândia',        nivelInicio: 3,  tipo: 'casas', corCasa: '#d4a373', corTelhado: '#8b4513' },
-    { nome: 'Taguatinga',       nivelInicio: 6,  tipo: 'casas', corCasa: '#e8d5b7', corTelhado: '#a0522d' },
-    { nome: 'Samambaia',        nivelInicio: 9,  tipo: 'casas', corCasa: '#c9b89e', corTelhado: '#6b3a2a' },
-    { nome: 'Gama',             nivelInicio: 12, tipo: 'casas', corCasa: '#f0e0c0', corTelhado: '#7a4a2a' },
-    { nome: 'Santa Maria',      nivelInicio: 15, tipo: 'casas', corCasa: '#bfae94', corTelhado: '#5c3a1e' },
-    { nome: 'Guará',            nivelInicio: 18, tipo: 'casas', corCasa: '#ddd5c5', corTelhado: '#8b6914' },
-    { nome: 'Braslândia',       nivelInicio: 21, tipo: 'casas', corCasa: '#c4a882', corTelhado: '#6e3b1e' },
-    { nome: 'Recanto das Emas', nivelInicio: 24, tipo: 'casas', corCasa: '#b8a080', corTelhado: '#5a2d0c' }
+// ---------- PRÉDIOS DE BRASÍLIA ----------
+let prediosEsquerda = [
+    { tipo: 'ministerio', y: 0 },
+    { tipo: 'catedral',   y: 180 },
+    { tipo: 'ministerio', y: 360 },
+    { tipo: 'palacio',    y: 540 }
 ];
-
-function obterCidade(nivel) {
-    let cidade = CIDADES[0];
-    for (let i = CIDADES.length - 1; i >= 0; i--) {
-        if (nivel >= CIDADES[i].nivelInicio) {
-            cidade = CIDADES[i];
-            break;
-        }
-    }
-    return cidade;
-}
-
-function configurarCidade(nivel) {
-    let cidade = obterCidade(nivel);
-    cidadeAtual = cidade.nome;
-
-    if (cidade.tipo === 'monumentos') {
-        prediosEsquerda = [
-            { tipo: 'ministerio', y: 0 },
-            { tipo: 'catedral',   y: 180 },
-            { tipo: 'ministerio', y: 360 },
-            { tipo: 'palacio',    y: 540 }
-        ];
-        prediosDireita = [
-            { tipo: 'ministerio', y: 0 },
-            { tipo: 'congresso',  y: 180 },
-            { tipo: 'ministerio', y: 360 },
-            { tipo: 'palacio',    y: 540 }
-        ];
-    } else {
-        prediosEsquerda = [
-            { tipo: 'casa1', y: 0,   cor: cidade.corCasa, telhado: cidade.corTelhado },
-            { tipo: 'poste', y: 100 },
-            { tipo: 'casa2', y: 160, cor: cidade.corCasa, telhado: cidade.corTelhado },
-            { tipo: 'casa1', y: 280, cor: cidade.corCasa, telhado: cidade.corTelhado },
-            { tipo: 'poste', y: 380 },
-            { tipo: 'casa3', y: 440, cor: cidade.corCasa, telhado: cidade.corTelhado }
-        ];
-        prediosDireita = [
-            { tipo: 'casa2', y: 0,   cor: cidade.corCasa, telhado: cidade.corTelhado },
-            { tipo: 'casa1', y: 120, cor: cidade.corCasa, telhado: cidade.corTelhado },
-            { tipo: 'poste', y: 240 },
-            { tipo: 'casa3', y: 300, cor: cidade.corCasa, telhado: cidade.corTelhado },
-            { tipo: 'casa1', y: 420, cor: cidade.corCasa, telhado: cidade.corTelhado },
-            { tipo: 'poste', y: 540 }
-        ];
-    }
-}
+let prediosDireita = [
+    { tipo: 'ministerio', y: 0 },
+    { tipo: 'congresso',  y: 180 },
+    { tipo: 'ministerio', y: 360 },
+    { tipo: 'palacio',    y: 540 }
+];
+let velocidadePredios = 1.5;
 
 // ========================================
 // AJUSTAR CANVAS
@@ -188,8 +136,19 @@ function iniciarJogo() {
     gotasChuva = [];
     frameRelampago = 0;
 
-    cidadeAtual = '';
-    configurarCidade(1);
+    // Reseta prédios
+    prediosEsquerda = [
+        { tipo: 'ministerio', y: 0 },
+        { tipo: 'catedral',   y: 180 },
+        { tipo: 'ministerio', y: 360 },
+        { tipo: 'palacio',    y: 540 }
+    ];
+    prediosDireita = [
+        { tipo: 'ministerio', y: 0 },
+        { tipo: 'congresso',  y: 180 },
+        { tipo: 'ministerio', y: 360 },
+        { tipo: 'palacio',    y: 540 }
+    ];
 
     teclas.ArrowUp = false;
     teclas.ArrowDown = false;
@@ -398,13 +357,7 @@ function loopPrincipal() {
             nivelAtual++;
             cenarioAtual = obterCenarioNivel(nivelAtual);
 
-            let cidadeAnterior = cidadeAtual;
-            configurarCidade(nivelAtual);
-            if (cidadeAtual !== cidadeAnterior) {
-                mostrarMensagem('🏙️ NÍVEL ' + nivelAtual + ' - Bem-vindo a ' + cidadeAtual + '!');
-            } else {
-                mostrarMensagem('⬆️ NÍVEL ' + nivelAtual + ' - ' + cenarioAtual.nome);
-            }
+            mostrarMensagem('⬆️ NÍVEL ' + nivelAtual + ' - ' + cenarioAtual.nome);
 
             inicializarObstaculos(nivelAtual);
 
@@ -517,7 +470,7 @@ function desenharCenario() {
         let p = prediosEsquerda[i];
         p.y += velocidadePredios;
         if (p.y > ALTURA_CANVAS) { p.y = -100; }
-        desenharPredio(p.tipo, xEsq, p.y, p);
+        desenharPredio(p.tipo, xEsq, p.y);
     }
 
     let xDir = LARGURA_CANVAS - 125;
@@ -525,12 +478,12 @@ function desenharCenario() {
         let p = prediosDireita[i];
         p.y += velocidadePredios;
         if (p.y > ALTURA_CANVAS) { p.y = -100; }
-        desenharPredio(p.tipo, xDir, p.y, p);
+        desenharPredio(p.tipo, xDir, p.y);
     }
 
-    // Arvorezinhas (só em Brasília)
-    if (obterCidade(nivelAtual).tipo === 'monumentos') {
-        ctx.fillStyle = '#3d7a2e';
+    // Arvorezinhas entre os monumentos
+    ctx.fillStyle = '#3d7a2e';
+    {
         for (let i = 0; i < prediosEsquerda.length; i++) {
             let yArvore = prediosEsquerda[i].y + 85;
             ctx.beginPath();
@@ -544,15 +497,11 @@ function desenharCenario() {
     }
 }
 
-function desenharPredio(tipo, x, y, predio) {
+function desenharPredio(tipo, x, y) {
     if (tipo === 'ministerio') desenharMinisterio(x, y);
     else if (tipo === 'congresso') desenharCongresso(x, y);
     else if (tipo === 'catedral') desenharCatedral(x, y);
     else if (tipo === 'palacio') desenharPalacio(x, y);
-    else if (tipo === 'casa1') desenharCasa1(x, y, predio);
-    else if (tipo === 'casa2') desenharCasa2(x, y, predio);
-    else if (tipo === 'casa3') desenharCasa3(x, y, predio);
-    else if (tipo === 'poste') desenharPoste(x, y);
 }
 
 // ========================================
@@ -650,120 +599,6 @@ function desenharPalacio(x, y) {
 }
 
 // ========================================
-// CASAS DAS CIDADES SATÉLITES
-// ========================================
-function desenharCasa1(x, y, p) {
-    let cor = p.cor || '#d4a373';
-    let telhado = p.telhado || '#8b4513';
-
-    ctx.fillStyle = cor;
-    ctx.fillRect(x + 15, y + 25, 90, 45);
-
-    ctx.fillStyle = telhado;
-    ctx.beginPath();
-    ctx.moveTo(x + 10, y + 28);
-    ctx.lineTo(x + 60, y + 3);
-    ctx.lineTo(x + 110, y + 28);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = '#5c3a1e';
-    ctx.fillRect(x + 50, y + 42, 18, 28);
-    ctx.fillStyle = '#ffd700';
-    ctx.beginPath();
-    ctx.arc(x + 64, y + 57, 2, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#87CEEB';
-    ctx.fillRect(x + 25, y + 35, 16, 14);
-    ctx.fillRect(x + 78, y + 35, 16, 14);
-    ctx.fillStyle = cor;
-    ctx.fillRect(x + 32, y + 35, 2, 14);
-    ctx.fillRect(x + 25, y + 41, 16, 2);
-    ctx.fillRect(x + 85, y + 35, 2, 14);
-    ctx.fillRect(x + 78, y + 41, 16, 2);
-}
-
-function desenharCasa2(x, y, p) {
-    let cor = p.cor || '#d4a373';
-    let telhado = p.telhado || '#8b4513';
-
-    ctx.fillStyle = cor;
-    ctx.fillRect(x + 10, y + 15, 100, 55);
-
-    ctx.fillStyle = telhado;
-    ctx.fillRect(x + 5, y + 10, 110, 10);
-
-    ctx.fillStyle = '#4a4a4a';
-    ctx.fillRect(x + 15, y + 35, 30, 35);
-    ctx.strokeStyle = '#666';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 4; i++) {
-        ctx.beginPath();
-        ctx.moveTo(x + 15, y + 40 + i * 8);
-        ctx.lineTo(x + 45, y + 40 + i * 8);
-        ctx.stroke();
-    }
-
-    ctx.fillStyle = '#87CEEB';
-    ctx.fillRect(x + 55, y + 25, 20, 16);
-    ctx.fillRect(x + 82, y + 25, 20, 16);
-
-    ctx.fillStyle = '#5c3a1e';
-    ctx.fillRect(x + 62, y + 48, 14, 22);
-}
-
-function desenharCasa3(x, y, p) {
-    let cor = p.cor || '#d4a373';
-    let telhado = p.telhado || '#8b4513';
-
-    ctx.fillStyle = '#999';
-    ctx.fillRect(x + 10, y + 45, 100, 5);
-
-    ctx.fillStyle = cor;
-    ctx.fillRect(x + 15, y + 15, 90, 35);
-
-    ctx.fillStyle = telhado;
-    ctx.beginPath();
-    ctx.moveTo(x + 10, y + 18);
-    ctx.lineTo(x + 110, y + 8);
-    ctx.lineTo(x + 110, y + 18);
-    ctx.lineTo(x + 10, y + 18);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = '#87CEEB';
-    ctx.fillRect(x + 20, y + 25, 14, 12);
-    ctx.fillRect(x + 52, y + 25, 14, 12);
-    ctx.fillRect(x + 84, y + 25, 14, 12);
-
-    ctx.fillStyle = '#5c3a1e';
-    ctx.fillRect(x + 38, y + 25, 12, 20);
-}
-
-function desenharPoste(x, y) {
-    ctx.fillStyle = '#777';
-    ctx.fillRect(x + 58, y, 4, 60);
-    ctx.fillStyle = '#555';
-    ctx.fillRect(x + 48, y, 24, 6);
-    ctx.fillStyle = '#ffdd44';
-    ctx.beginPath();
-    ctx.arc(x + 55, y + 8, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(x + 65, y + 8, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255, 220, 50, 0.06)';
-    ctx.beginPath();
-    ctx.moveTo(x + 48, y + 8);
-    ctx.lineTo(x + 30, y + 60);
-    ctx.lineTo(x + 90, y + 60);
-    ctx.lineTo(x + 72, y + 8);
-    ctx.closePath();
-    ctx.fill();
-}
-
-// ========================================
 // HUD
 // ========================================
 function atualizarHUD() {
@@ -771,7 +606,7 @@ function atualizarHUD() {
     document.getElementById('pontos').textContent = pontuacao;
     document.getElementById('entregas').textContent = totalEntregas;
     document.getElementById('nivel').textContent = nivelAtual;
-    document.getElementById('nivel-nome').textContent = cidadeAtual;
+    document.getElementById('nivel-nome').textContent = 'Brasília';
 
     let coracoes = '';
     for (let i = 0; i < CONFIG_VIDAS.inicial; i++) {
