@@ -48,6 +48,11 @@ let escudoAtivo = false;       // Se o poder está ativo
 let escudoFrames = 0;          // Frames restantes do escudo (6s = 360 frames)
 let timerEscudo = null;        // Timer para spawnar escudo
 
+// ---------- LADRÃO DE PEDIDOS ----------
+let ladrao = null;              // Objeto do ladrão (moto que rouba pedido)
+let contadorEntregas = 0;       // Conta entregas para saber quando ativar ladrão
+let ladraoFase = 'nenhum';      // 'nenhum', 'descendo', 'roubando', 'fugindo'
+
 // ---------- EFEITOS VISUAIS ----------
 let cenarioAtual = null;    // Objeto com cores/efeitos do nível
 let gotasChuva = [];        // Array de gotas de chuva
@@ -152,6 +157,11 @@ function iniciarJogo() {
     tempoItemSpawnado = false;
     tempoPausado = false;
     framesPausa = 0;
+
+    // Reseta ladrão
+    ladrao = null;
+    contadorEntregas = 0;
+    ladraoFase = 'nenhum';
 
     // Reseta escudo
     escudoItem = null;
@@ -421,9 +431,28 @@ function loopPrincipal() {
 
         // Cria novo pedido
         criarPedido();
+
+        // Conta entregas para o ladrão (nível 10+, a cada 3 entregas)
+        if (nivelAtual >= 10) {
+            contadorEntregas++;
+            if (contadorEntregas >= 3) {
+                contadorEntregas = 0;
+                // Agenda ladrão para aparecer em 2-4 segundos
+                setTimeout(function() {
+                    if (!jogoRodando || !pedidoAtual || pedidoAtual.coletado) return;
+                    iniciarLadrao();
+                }, (2 + Math.random() * 2) * 1000);
+            }
+        }
     }
 
-    // 10. Efeitos visuais do cenário
+    // 12. Atualiza e desenha ladrão
+    if (ladrao) {
+        atualizarLadrao();
+        desenharLadrao(ctx);
+    }
+
+    // 13. Efeitos visuais do cenário
     desenharEfeitosCenario();
 
     // 11. Atualiza HUD
@@ -977,6 +1006,155 @@ function desenharTempoItem(ctx) {
     ctx.font = 'bold 10px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('+' + tempoItem.valor + 's', cx, cy + raio + 14);
+    ctx.textAlign = 'start';
+}
+
+// ========================================
+// LADRÃO DE PEDIDOS
+// ========================================
+
+/**
+ * iniciarLadrao()
+ * -----------------
+ * Cria um ladrão que desce rápido até o pedido,
+ * rouba ele e foge pra cima.
+ * Aparece a partir do nível 10, a cada 3 entregas.
+ */
+function iniciarLadrao() {
+    if (!pedidoAtual || pedidoAtual.coletado) return;
+
+    // Ladrão começa acima da tela, na mesma coluna do pedido
+    ladrao = {
+        x: pedidoAtual.x - 5,
+        y: -60,
+        largura: 28,
+        altura: 45,
+        velocidade: 6,           // Bem rápido
+        alvoX: pedidoAtual.x - 5,
+        alvoY: pedidoAtual.y,
+        cor: '#ff0000',
+        temPedido: false
+    };
+    ladraoFase = 'descendo';
+    mostrarMensagem('⚠️ LADRÃO! Ele quer seu pedido!');
+}
+
+/**
+ * atualizarLadrao()
+ * -------------------
+ * Move o ladrão conforme a fase:
+ * 1. descendo: vai rápido até o pedido
+ * 2. roubando: pega o pedido
+ * 3. fugindo: sobe rápido e some
+ */
+function atualizarLadrao() {
+    if (!ladrao) return;
+
+    if (ladraoFase === 'descendo') {
+        // Desce em direção ao pedido
+        ladrao.y += ladrao.velocidade;
+
+        // Chegou no pedido?
+        if (ladrao.y >= ladrao.alvoY - 10) {
+            ladrao.y = ladrao.alvoY - 10;
+            ladraoFase = 'roubando';
+            ladrao.temPedido = true;
+
+            // Rouba o pedido!
+            if (pedidoAtual && !pedidoAtual.coletado) {
+                mostrarMensagem('😡 Pedido roubado! Novo pedido aparecendo...');
+                // Cria novo pedido após 1 segundo
+                pedidoAtual = null;
+                setTimeout(function() {
+                    if (jogoRodando) {
+                        criarPedido();
+                    }
+                }, 1000);
+            }
+            ladraoFase = 'fugindo';
+        }
+
+    } else if (ladraoFase === 'fugindo') {
+        // Foge pra cima rápido
+        ladrao.y -= ladrao.velocidade * 1.5;
+
+        // Saiu da tela? Remove
+        if (ladrao.y < -80) {
+            ladrao = null;
+            ladraoFase = 'nenhum';
+        }
+    }
+}
+
+/**
+ * desenharLadrao(ctx)
+ * ---------------------
+ * Desenha o ladrão como uma moto preta com piloto
+ * de capuz (visual de bandido).
+ */
+function desenharLadrao(ctx) {
+    if (!ladrao) return;
+
+    let cx = ladrao.x + ladrao.largura / 2;
+    let ly = ladrao.y;
+
+    // Roda traseira
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.ellipse(cx, ly + ladrao.altura - 4, 7, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Chassi (moto preta)
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.moveTo(cx - 5, ly + ladrao.altura - 8);
+    ctx.lineTo(cx + 5, ly + ladrao.altura - 8);
+    ctx.lineTo(cx + 4, ly + 16);
+    ctx.lineTo(cx - 4, ly + 16);
+    ctx.closePath();
+    ctx.fill();
+
+    // Piloto (capuz preto = bandido)
+    ctx.fillStyle = '#111';
+    ctx.fillRect(cx - 6, ly + 10, 12, 12);
+
+    // Capuz
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(cx, ly + 7, 7, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Olhos vermelhos (ameaçador)
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(cx - 4, ly + 5, 3, 2);
+    ctx.fillRect(cx + 1, ly + 5, 3, 2);
+
+    // Guidão
+    ctx.fillStyle = '#444';
+    ctx.fillRect(cx - 12, ly + 14, 24, 2);
+
+    // Roda dianteira
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.ellipse(cx, ly + 3, 6, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Pedido roubado (se tem)
+    if (ladrao.temPedido) {
+        ctx.fillStyle = CORES.pedido;
+        ctx.fillRect(cx - 8, ly + 22, 16, 12);
+        ctx.fillStyle = '#fff';
+        ctx.font = '8px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('📦', cx, ly + 31);
+        ctx.textAlign = 'start';
+    }
+
+    // Indicador de perigo (triângulo vermelho acima)
+    ctx.fillStyle = '#ff0000';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('⚠', cx, ly - 5);
     ctx.textAlign = 'start';
 }
 
