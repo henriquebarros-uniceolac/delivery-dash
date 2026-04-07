@@ -390,7 +390,7 @@ function loopPrincipal() {
         mostrarMensagem('📦 Pedido coletado! Vá até o destino 🏠');
 
         // Nível 10+: a cada 3 coletas, ladrão tenta roubar
-        if (nivelAtual >= 10 && !ladrao) {
+        if (nivelAtual >= 7 && !ladrao) {
             contadorEntregas++;
             if (contadorEntregas >= 3) {
                 contadorEntregas = 0;
