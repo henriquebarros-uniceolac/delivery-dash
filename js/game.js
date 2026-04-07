@@ -389,15 +389,18 @@ function loopPrincipal() {
     if (resultadoEntrega.coletou) {
         mostrarMensagem('📦 Pedido coletado! Vá até o destino 🏠');
 
-        // Nível 10+: a cada 3 entregas, ladrão tenta roubar o pedido
-        if (nivelAtual >= 10 && contadorEntregas >= 3 && !ladrao) {
-            contadorEntregas = 0;
-            // Ladrão aparece atrás do jogador após 1-2s
-            setTimeout(function() {
-                if (jogoRodando && jogador.carregando && !ladrao) {
-                    iniciarLadrao();
-                }
-            }, (1 + Math.random()) * 1000);
+        // Nível 10+: a cada 3 coletas, ladrão tenta roubar
+        if (nivelAtual >= 10 && !ladrao) {
+            contadorEntregas++;
+            if (contadorEntregas >= 3) {
+                contadorEntregas = 0;
+                // Ladrão aparece 2-3s depois de coletar
+                setTimeout(function() {
+                    if (jogoRodando && jogador.carregando && !ladrao) {
+                        iniciarLadrao();
+                    }
+                }, (2 + Math.random()) * 1000);
+            }
         }
     }
 
@@ -1019,72 +1022,77 @@ function desenharTempoItem(ctx) {
 /**
  * iniciarLadrao()
  * -----------------
- * Cria um ladrão que aparece ATRÁS do jogador (abaixo),
- * se aproxima devagar, acelera, encosta no jogador,
- * rouba o pedido e foge pra frente (cima) rapidão.
+ * Cria um ladrão atrás do jogador. Primeiro mostra um
+ * alerta por 2 segundos, depois ele avança.
  */
 function iniciarLadrao() {
     if (!jogador.carregando) return;
 
-    // Começa abaixo da tela, perto da coluna do jogador
+    // Começa abaixo da tela, na mesma faixa do jogador
     ladrao = {
-        x: jogador.x + (Math.random() > 0.5 ? 30 : -30),
-        y: ALTURA_CANVAS + 50,
+        x: jogador.x,
+        y: ALTURA_CANVAS + 60,
         largura: 28,
         altura: 45,
-        velocidade: 2,       // Começa devagar
-        temPedido: false
+        velocidade: 1.5,
+        temPedido: false,
+        alertaFrames: 120  // 2 segundos de alerta (120 frames a 60fps)
     };
-    ladraoFase = 'aproximando';
-    mostrarMensagem('⚠️ Ladrão se aproximando!');
+    ladraoFase = 'alerta';
+    mostrarMensagem('🚨 LADRÃO ATRÁS DE VOCÊ! DESVIE!');
 }
 
 /**
  * atualizarLadrao()
  * -------------------
  * Move o ladrão em 3 fases:
- * 1. aproximando: sobe devagar atrás do jogador
- * 2. acelerando: quando perto, acelera e persegue
- * 3. fugindo: roubou o pedido, sai pra cima muito rápido
+ * 1. alerta: aparece atrás, sobe devagar, sinal piscando (2s pra reagir)
+ * 2. avancando: acelera forte na direção do jogador pra roubar
+ * 3. fugindo: roubou (ou não) e sai pra cima rapidão
  */
 function atualizarLadrao() {
     if (!ladrao) return;
 
-    if (ladraoFase === 'aproximando') {
-        // Sobe devagar (vem de trás)
+    // Se o jogador entregou ou perdeu o pedido, ladrão desiste
+    if (!jogador.carregando && !ladrao.temPedido) {
+        ladraoFase = 'fugindo';
+        ladrao.velocidade = 8;
+    }
+
+    if (ladraoFase === 'alerta') {
+        // Sobe devagar atrás do jogador (dá tempo de ver o alerta)
         ladrao.y -= ladrao.velocidade;
-        // Se aproxima horizontalmente do jogador
-        if (ladrao.x < jogador.x) ladrao.x += 0.5;
-        if (ladrao.x > jogador.x) ladrao.x -= 0.5;
 
-        // Acelera gradualmente
-        ladrao.velocidade += 0.03;
+        // Segue a posição X do jogador (fica atrás dele)
+        ladrao.x = jogador.x;
 
-        // Quando fica perto, muda pra fase de aceleração
-        let distancia = ladrao.y - jogador.y;
-        if (distancia < 150) {
-            ladraoFase = 'acelerando';
-            mostrarMensagem('⚠️ Ladrão acelerando! Cuidado!');
+        ladrao.alertaFrames--;
+
+        // Após 2 segundos de alerta, AVANÇA
+        if (ladrao.alertaFrames <= 0) {
+            ladraoFase = 'avancando';
+            ladrao.velocidade = 3;
+            mostrarMensagem('⚠️ ELE VEM! DESVIA!');
         }
 
-    } else if (ladraoFase === 'acelerando') {
-        // Acelera forte em direção ao jogador
-        ladrao.velocidade += 0.15;
+    } else if (ladraoFase === 'avancando') {
+        // Acelera forte pra cima (em direção ao jogador)
+        ladrao.velocidade += 0.12;
         ladrao.y -= ladrao.velocidade;
 
-        // Persegue horizontalmente
-        if (ladrao.x < jogador.x) ladrao.x += 2;
-        if (ladrao.x > jogador.x) ladrao.x -= 2;
+        // Persegue o jogador horizontalmente (mas com delay, dá pra desviar)
+        let diffX = jogador.x - ladrao.x;
+        ladrao.x += diffX * 0.06; // Segue devagar no X (jogador pode escapar)
 
-        // Encostou no jogador? Rouba!
+        // Encostou no jogador? ROUBA!
         if (verificarColisao(ladrao, jogador) && jogador.carregando) {
             jogador.carregando = false;
             ladrao.temPedido = true;
             ladraoFase = 'fugindo';
-            ladrao.velocidade = 8;
-            mostrarMensagem('😡 Roubaram seu pedido!');
+            ladrao.velocidade = 10;
+            mostrarMensagem('😡 Roubaram seu pedido! Novo pedido chegando...');
 
-            // Novo pedido aparece em 1.5 segundo
+            // Limpa destino e cria novo pedido
             destinoAtual = null;
             setTimeout(function() {
                 if (jogoRodando) {
@@ -1093,28 +1101,26 @@ function atualizarLadrao() {
             }, 1500);
         }
 
-        // Se passou do jogador sem encostar (jogador desviou), desiste
-        if (ladrao.y < jogador.y - 100) {
+        // Se passou do jogador sem pegar (desviou!), desiste
+        if (ladrao.y < jogador.y - 120) {
             ladraoFase = 'fugindo';
-            ladrao.velocidade = 8;
+            ladrao.velocidade = 10;
+            if (!ladrao.temPedido) {
+                mostrarMensagem('✅ Você escapou do ladrão!');
+                pontuacao += 50; // Bônus por escapar
+            }
         }
 
     } else if (ladraoFase === 'fugindo') {
         // Foge pra cima muito rápido
         ladrao.y -= ladrao.velocidade;
-        ladrao.velocidade += 0.2;
+        ladrao.velocidade += 0.3;
 
         // Saiu da tela
-        if (ladrao.y < -100) {
+        if (ladrao.y < -120) {
             ladrao = null;
             ladraoFase = 'nenhum';
         }
-    }
-
-    // Se o jogador entregou o pedido enquanto o ladrão vinha, cancela
-    if (ladrao && !jogador.carregando && !ladrao.temPedido) {
-        ladraoFase = 'fugindo';
-        ladrao.velocidade = 8;
     }
 }
 
@@ -1171,11 +1177,11 @@ function desenharLadrao(ctx) {
     ctx.ellipse(cx, ly + 3, 6, 3, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Mão estendida pro lado (quando acelerando, tentando pegar)
-    if (ladraoFase === 'acelerando') {
+    // Mão estendida pro lado (quando avançando, tentando pegar)
+    if (ladraoFase === 'avancando') {
         ctx.fillStyle = '#8B6914';
         let lado = ladrao.x < jogador.x ? 1 : -1;
-        ctx.fillRect(cx + lado * 10, ly + 12, lado * 10, 4);
+        ctx.fillRect(cx + lado * 10, ly + 12, lado * 12, 4);
     }
 
     // Pedido roubado nas costas
@@ -1187,12 +1193,19 @@ function desenharLadrao(ctx) {
         ctx.fillRect(cx - 5, ly + 27, 10, 2);
     }
 
-    // Indicador de perigo (pisca)
-    if (Math.floor(Date.now() / 300) % 2 === 0) {
+    // Indicador de perigo (pisca mais rápido quando avançando)
+    let velocidadePisca = ladraoFase === 'alerta' ? 400 : 150;
+    if (Math.floor(Date.now() / velocidadePisca) % 2 === 0) {
         ctx.fillStyle = '#ff0000';
-        ctx.font = 'bold 16px Arial';
+        ctx.font = 'bold 18px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('⚠', cx, ly - 8);
+
+        // Na fase de alerta, mostra texto grande "LADRÃO!"
+        if (ladraoFase === 'alerta') {
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('LADRÃO!', cx, ly - 22);
+        }
         ctx.textAlign = 'start';
     }
 }
