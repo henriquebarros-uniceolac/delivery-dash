@@ -70,22 +70,87 @@ let frameRelampago = 0;     // Contador para efeito de relâmpago
 // Variáveis para o efeito da estrada
 let offsetEstrada = 0; // Para animar as faixas da estrada
 
-// ---------- PRÉDIOS DE BRASÍLIA ----------
-// Cada prédio tem um tipo fixo e uma posição Y que desce pela tela.
-// Quando sai por baixo, volta ao topo mantendo o mesmo tipo.
-let prediosEsquerda = [
-    { tipo: 'ministerio', y: 0 },
-    { tipo: 'catedral',   y: 180 },
-    { tipo: 'ministerio', y: 360 },
-    { tipo: 'palacio',    y: 540 }
+// ---------- PRÉDIOS / CASAS ----------
+let prediosEsquerda = [];
+let prediosDireita = [];
+let velocidadePredios = 1.5;
+let cidadeAtual = '';
+
+// Sistema de cidades do DF (muda a cada 3 níveis)
+const CIDADES = [
+    { nome: 'Brasília',        nivelInicio: 1,  tipo: 'monumentos' },
+    { nome: 'Ceilândia',       nivelInicio: 3,  tipo: 'casas', corCasa: '#d4a373', corTelhado: '#8b4513' },
+    { nome: 'Taguatinga',      nivelInicio: 6,  tipo: 'casas', corCasa: '#e8d5b7', corTelhado: '#a0522d' },
+    { nome: 'Samambaia',       nivelInicio: 9,  tipo: 'casas', corCasa: '#c9b89e', corTelhado: '#6b3a2a' },
+    { nome: 'Gama',            nivelInicio: 12, tipo: 'casas', corCasa: '#f0e0c0', corTelhado: '#7a4a2a' },
+    { nome: 'Santa Maria',     nivelInicio: 15, tipo: 'casas', corCasa: '#bfae94', corTelhado: '#5c3a1e' },
+    { nome: 'Guará',           nivelInicio: 18, tipo: 'casas', corCasa: '#ddd5c5', corTelhado: '#8b6914' },
+    { nome: 'Braslândia',      nivelInicio: 21, tipo: 'casas', corCasa: '#c4a882', corTelhado: '#6e3b1e' },
+    { nome: 'Recanto das Emas', nivelInicio: 24, tipo: 'casas', corCasa: '#b8a080', corTelhado: '#5a2d0c' }
 ];
-let prediosDireita = [
-    { tipo: 'ministerio', y: 0 },
-    { tipo: 'congresso',  y: 180 },
-    { tipo: 'ministerio', y: 360 },
-    { tipo: 'palacio',    y: 540 }
-];
-let velocidadePredios = 1.5; // Velocidade que os prédios descem
+
+/**
+ * obterCidade(nivel)
+ * --------------------
+ * Retorna a cidade correspondente ao nível atual.
+ */
+function obterCidade(nivel) {
+    let cidade = CIDADES[0];
+    for (let i = CIDADES.length - 1; i >= 0; i--) {
+        if (nivel >= CIDADES[i].nivelInicio) {
+            cidade = CIDADES[i];
+            break;
+        }
+    }
+    return cidade;
+}
+
+/**
+ * configurarCidade(nivel)
+ * -------------------------
+ * Configura os prédios/casas das laterais baseado na cidade.
+ */
+function configurarCidade(nivel) {
+    let cidade = obterCidade(nivel);
+
+    // Só reconfigura se mudou de cidade
+    if (cidade.nome === cidadeAtual) return;
+    cidadeAtual = cidade.nome;
+
+    if (cidade.tipo === 'monumentos') {
+        // Brasília: monumentos famosos
+        prediosEsquerda = [
+            { tipo: 'ministerio', y: 0 },
+            { tipo: 'catedral',   y: 180 },
+            { tipo: 'ministerio', y: 360 },
+            { tipo: 'palacio',    y: 540 }
+        ];
+        prediosDireita = [
+            { tipo: 'ministerio', y: 0 },
+            { tipo: 'congresso',  y: 180 },
+            { tipo: 'ministerio', y: 360 },
+            { tipo: 'palacio',    y: 540 }
+        ];
+    } else {
+        // Cidades satélites: casinhas + postes
+        prediosEsquerda = [
+            { tipo: 'casa1', y: 0,   cor: cidade.corCasa, telhado: cidade.corTelhado },
+            { tipo: 'poste', y: 100 },
+            { tipo: 'casa2', y: 160, cor: cidade.corCasa, telhado: cidade.corTelhado },
+            { tipo: 'casa1', y: 280, cor: cidade.corCasa, telhado: cidade.corTelhado },
+            { tipo: 'poste', y: 380 },
+            { tipo: 'casa3', y: 440, cor: cidade.corCasa, telhado: cidade.corTelhado }
+        ];
+        prediosDireita = [
+            { tipo: 'casa2', y: 0,   cor: cidade.corCasa, telhado: cidade.corTelhado },
+            { tipo: 'casa1', y: 120, cor: cidade.corCasa, telhado: cidade.corTelhado },
+            { tipo: 'poste', y: 240 },
+            { tipo: 'casa3', y: 300, cor: cidade.corCasa, telhado: cidade.corTelhado },
+            { tipo: 'casa1', y: 420, cor: cidade.corCasa, telhado: cidade.corTelhado },
+            { tipo: 'poste', y: 540 }
+        ];
+    }
+}
 
 /**
  * ajustarCanvas()
@@ -189,15 +254,9 @@ function iniciarJogo() {
     gotasChuva = [];
     frameRelampago = 0;
 
-    // Reseta prédios nas posições iniciais
-    prediosEsquerda[0].y = 0;
-    prediosEsquerda[1].y = 180;
-    prediosEsquerda[2].y = 360;
-    prediosEsquerda[3].y = 540;
-    prediosDireita[0].y = 0;
-    prediosDireita[1].y = 180;
-    prediosDireita[2].y = 360;
-    prediosDireita[3].y = 540;
+    // Configura cidade e prédios/casas
+    cidadeAtual = '';
+    configurarCidade(1);
 
     // Reseta teclas (evita jogador sair andando)
     teclas.ArrowUp = false;
@@ -459,6 +518,15 @@ function loopPrincipal() {
             nivelAtual++;
             cenarioAtual = obterCenarioNivel(nivelAtual);
 
+            // Verifica mudança de cidade
+            let cidadeAnterior = cidadeAtual;
+            configurarCidade(nivelAtual);
+            if (cidadeAtual !== cidadeAnterior) {
+                mostrarMensagem('🏙️ NÍVEL ' + nivelAtual + ' - Bem-vindo a ' + cidadeAtual + '!');
+            } else {
+                mostrarMensagem('⬆️ NÍVEL ' + nivelAtual + ' - ' + cenarioAtual.nome + '!');
+            }
+
             // Adiciona obstáculos gradualmente (respeitando o máximo)
             let novaQuantidade = CONFIG_DIFICULDADE.obstaculosIniciais
                 + (nivelAtual - 1) * CONFIG_DIFICULDADE.obstaculosPorNivel;
@@ -466,8 +534,6 @@ function loopPrincipal() {
                 novaQuantidade = CONFIG_DIFICULDADE.obstaculosMaximo;
             }
             inicializarObstaculos(nivelAtual);
-
-            mostrarMensagem('⬆️ NÍVEL ' + nivelAtual + ' - ' + cenarioAtual.nome + '!');
 
             // Inicializa gotas de chuva se necessário
             if (cenarioAtual.chuva && gotasChuva.length === 0) {
@@ -612,7 +678,7 @@ function desenharCenario() {
         if (p.y > ALTURA_CANVAS) {
             p.y = -100;
         }
-        desenharPredio(p.tipo, xEsq, p.y);
+        desenharPredio(p.tipo, xEsq, p.y, p);
     }
 
     // Move e desenha os prédios do lado DIREITO
@@ -623,7 +689,7 @@ function desenharCenario() {
         if (p.y > ALTURA_CANVAS) {
             p.y = -100;
         }
-        desenharPredio(p.tipo, xDir, p.y);
+        desenharPredio(p.tipo, xDir, p.y, p);
     }
 
     // Arvorezinhas entre os prédios (jardim da Esplanada)
@@ -649,11 +715,15 @@ function desenharCenario() {
  * @param {number} x - Posição horizontal
  * @param {number} y - Posição vertical
  */
-function desenharPredio(tipo, x, y) {
+function desenharPredio(tipo, x, y, predio) {
     if (tipo === 'ministerio') desenharMinisterio(x, y);
     else if (tipo === 'congresso') desenharCongresso(x, y);
     else if (tipo === 'catedral') desenharCatedral(x, y);
     else if (tipo === 'palacio') desenharPalacio(x, y);
+    else if (tipo === 'casa1') desenharCasa1(x, y, predio);
+    else if (tipo === 'casa2') desenharCasa2(x, y, predio);
+    else if (tipo === 'casa3') desenharCasa3(x, y, predio);
+    else if (tipo === 'poste') desenharPoste(x, y);
 }
 
 /**
@@ -815,6 +885,161 @@ function desenharPalacio(x, y) {
     ctx.fillRect(x + 10, y + 58, 100, 5);
 }
 
+// ========================================
+// CASAS DAS CIDADES SATÉLITES
+// ========================================
+
+/**
+ * desenharCasa1(x, y, p)
+ * Casa pequena com telhado triangular e porta.
+ */
+function desenharCasa1(x, y, p) {
+    let cor = p.cor || '#d4a373';
+    let telhado = p.telhado || '#8b4513';
+
+    // Parede
+    ctx.fillStyle = cor;
+    ctx.fillRect(x + 15, y + 25, 90, 45);
+
+    // Telhado triangular
+    ctx.fillStyle = telhado;
+    ctx.beginPath();
+    ctx.moveTo(x + 10, y + 28);
+    ctx.lineTo(x + 60, y + 3);
+    ctx.lineTo(x + 110, y + 28);
+    ctx.closePath();
+    ctx.fill();
+
+    // Porta
+    ctx.fillStyle = '#5c3a1e';
+    ctx.fillRect(x + 50, y + 42, 18, 28);
+    // Maçaneta
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.arc(x + 64, y + 57, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Janela
+    ctx.fillStyle = '#87CEEB';
+    ctx.fillRect(x + 25, y + 35, 16, 14);
+    ctx.fillRect(x + 78, y + 35, 16, 14);
+    // Cruz da janela
+    ctx.fillStyle = cor;
+    ctx.fillRect(x + 32, y + 35, 2, 14);
+    ctx.fillRect(x + 25, y + 41, 16, 2);
+    ctx.fillRect(x + 85, y + 35, 2, 14);
+    ctx.fillRect(x + 78, y + 41, 16, 2);
+}
+
+/**
+ * desenharCasa2(x, y, p)
+ * Casa com garagem e telhado reto.
+ */
+function desenharCasa2(x, y, p) {
+    let cor = p.cor || '#d4a373';
+    let telhado = p.telhado || '#8b4513';
+
+    // Parede principal
+    ctx.fillStyle = cor;
+    ctx.fillRect(x + 10, y + 15, 100, 55);
+
+    // Telhado reto
+    ctx.fillStyle = telhado;
+    ctx.fillRect(x + 5, y + 10, 110, 10);
+
+    // Garagem (lado esquerdo)
+    ctx.fillStyle = '#4a4a4a';
+    ctx.fillRect(x + 15, y + 35, 30, 35);
+    // Linhas da porta da garagem
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 4; i++) {
+        ctx.beginPath();
+        ctx.moveTo(x + 15, y + 40 + i * 8);
+        ctx.lineTo(x + 45, y + 40 + i * 8);
+        ctx.stroke();
+    }
+
+    // Janelas
+    ctx.fillStyle = '#87CEEB';
+    ctx.fillRect(x + 55, y + 25, 20, 16);
+    ctx.fillRect(x + 82, y + 25, 20, 16);
+
+    // Porta
+    ctx.fillStyle = '#5c3a1e';
+    ctx.fillRect(x + 62, y + 48, 14, 22);
+}
+
+/**
+ * desenharCasa3(x, y, p)
+ * Casa térrea simples, baixa e comprida.
+ */
+function desenharCasa3(x, y, p) {
+    let cor = p.cor || '#d4a373';
+    let telhado = p.telhado || '#8b4513';
+
+    // Muro na frente
+    ctx.fillStyle = '#999';
+    ctx.fillRect(x + 10, y + 45, 100, 5);
+
+    // Parede
+    ctx.fillStyle = cor;
+    ctx.fillRect(x + 15, y + 15, 90, 35);
+
+    // Telhado inclinado
+    ctx.fillStyle = telhado;
+    ctx.beginPath();
+    ctx.moveTo(x + 10, y + 18);
+    ctx.lineTo(x + 110, y + 8);
+    ctx.lineTo(x + 110, y + 18);
+    ctx.lineTo(x + 10, y + 18);
+    ctx.closePath();
+    ctx.fill();
+
+    // Janelas (3 janelinhas)
+    ctx.fillStyle = '#87CEEB';
+    ctx.fillRect(x + 20, y + 25, 14, 12);
+    ctx.fillRect(x + 52, y + 25, 14, 12);
+    ctx.fillRect(x + 84, y + 25, 14, 12);
+
+    // Porta
+    ctx.fillStyle = '#5c3a1e';
+    ctx.fillRect(x + 38, y + 25, 12, 20);
+}
+
+/**
+ * desenharPoste(x, y)
+ * Poste de luz na calçada.
+ */
+function desenharPoste(x, y) {
+    // Poste (vara cinza)
+    ctx.fillStyle = '#777';
+    ctx.fillRect(x + 58, y, 4, 60);
+
+    // Luminária no topo
+    ctx.fillStyle = '#555';
+    ctx.fillRect(x + 48, y, 24, 6);
+
+    // Luz (amarela)
+    ctx.fillStyle = '#ffdd44';
+    ctx.beginPath();
+    ctx.arc(x + 55, y + 8, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + 65, y + 8, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cone de luz (sutil)
+    ctx.fillStyle = 'rgba(255, 220, 50, 0.06)';
+    ctx.beginPath();
+    ctx.moveTo(x + 48, y + 8);
+    ctx.lineTo(x + 30, y + 60);
+    ctx.lineTo(x + 90, y + 60);
+    ctx.lineTo(x + 72, y + 8);
+    ctx.closePath();
+    ctx.fill();
+}
+
 /**
  * atualizarHUD()
  * ----------------
@@ -825,7 +1050,7 @@ function atualizarHUD() {
     document.getElementById('pontos').textContent = pontuacao;
     document.getElementById('entregas').textContent = totalEntregas;
     document.getElementById('nivel').textContent = nivelAtual;
-    document.getElementById('nivel-nome').textContent = cenarioAtual.nome;
+    document.getElementById('nivel-nome').textContent = cidadeAtual;
 
     // Atualiza corações
     let coracoes = '';
