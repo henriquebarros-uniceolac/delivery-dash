@@ -22,13 +22,17 @@ let jogador = {
 
 // ---------- CONTROLE DE TECLAS ----------
 // Objeto que rastreia quais teclas estão pressionadas
-// Isso permite movimento suave (segurar a tecla)
 let teclas = {
     ArrowUp: false,
     ArrowDown: false,
     ArrowLeft: false,
     ArrowRight: false
 };
+
+// ---------- CONTROLES INVERTIDOS ----------
+// Quando o jogador passa numa poça, os controles esquerda/direita invertem
+let controlesInvertidos = false;
+let framesInvertidos = 0;  // Contador de frames (2.5s = 150 frames)
 
 /**
  * inicializarJogador()
@@ -138,13 +142,31 @@ function moverJogador() {
     if (teclas.ArrowDown) {
         jogador.y += jogador.velocidade;
     }
-    // Move para esquerda
-    if (teclas.ArrowLeft) {
-        jogador.x -= jogador.velocidade;
+    // Conta inversão de controles
+    if (controlesInvertidos) {
+        framesInvertidos--;
+        if (framesInvertidos <= 0) {
+            controlesInvertidos = false;
+        }
     }
-    // Move para direita
-    if (teclas.ArrowRight) {
-        jogador.x += jogador.velocidade;
+
+    // Move para esquerda/direita (inverte se passou na poça)
+    if (controlesInvertidos) {
+        // INVERTIDO: esquerda vai pra direita e vice-versa
+        if (teclas.ArrowLeft) {
+            jogador.x += jogador.velocidade;
+        }
+        if (teclas.ArrowRight) {
+            jogador.x -= jogador.velocidade;
+        }
+    } else {
+        // Normal
+        if (teclas.ArrowLeft) {
+            jogador.x -= jogador.velocidade;
+        }
+        if (teclas.ArrowRight) {
+            jogador.x += jogador.velocidade;
+        }
     }
 
     // ---------- LIMITES DA ESTRADA ----------

@@ -371,3 +371,21 @@ function verificarColisaoObstaculos() {
     }
     return false;
 }
+
+/**
+ * obterObstaculoColidido()
+ * --------------------------
+ * Retorna o primeiro obstáculo com que o jogador colidiu,
+ * ou null se não colidiu com nenhum.
+ * Usado para saber o TIPO do obstáculo (poça vs carro etc).
+ *
+ * @returns {Object|null} - O obstáculo colidido ou null
+ */
+function obterObstaculoColidido() {
+    for (let i = 0; i < obstaculos.length; i++) {
+        if (verificarColisao(jogador, obstaculos[i])) {
+            return obstaculos[i];
+        }
+    }
+    return null;
+}

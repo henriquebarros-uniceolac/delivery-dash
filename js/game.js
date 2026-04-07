@@ -295,31 +295,47 @@ function loopPrincipal() {
     }
 
     // 8. Verifica colisões com obstáculos
-    // Ignora se invencível OU se escudo ativo
-    if (framesInvencivel === 0 && !escudoAtivo && verificarColisaoObstaculos()) {
-        vidas--;
+    if (framesInvencivel === 0 && !escudoAtivo) {
+        let obstaculoColidido = obterObstaculoColidido();
 
-        if (vidas <= 0) {
-            gameOver('vidas');
-            return;
+        if (obstaculoColidido) {
+            if (obstaculoColidido.tipo === 'poca') {
+                // POÇA: não perde vida, mas controles invertem!
+                if (!controlesInvertidos) {
+                    controlesInvertidos = true;
+                    framesInvertidos = 150; // 2.5 segundos
+                    mostrarMensagem('💦 Poça! Controles invertidos!');
+
+                    // Flash azul
+                    canvas.style.boxShadow = '0 0 30px blue';
+                    setTimeout(function() {
+                        canvas.style.boxShadow = 'none';
+                    }, 300);
+
+                    // Pequena invencibilidade pra não pegar a mesma poça
+                    framesInvencivel = 30;
+                }
+            } else {
+                // Outros obstáculos: perde vida
+                vidas--;
+
+                if (vidas <= 0) {
+                    gameOver('vidas');
+                    return;
+                }
+
+                framesInvencivel = CONFIG_VIDAS.invencivel;
+                jogador.y = ALTURA_CANVAS - jogador.altura - 100;
+
+                canvas.style.boxShadow = '0 0 30px red';
+                setTimeout(function() {
+                    canvas.style.boxShadow = 'none';
+                }, 300);
+
+                mostrarMensagem('💔 -1 vida! Restam ' + vidas);
+                agendarCoracao();
+            }
         }
-
-        // Ativa invencibilidade temporária
-        framesInvencivel = CONFIG_VIDAS.invencivel;
-
-        // Reposiciona o jogador (respawn)
-        jogador.y = ALTURA_CANVAS - jogador.altura - 100;
-
-        // Efeito visual de dano (flash vermelho)
-        canvas.style.boxShadow = '0 0 30px red';
-        setTimeout(function() {
-            canvas.style.boxShadow = 'none';
-        }, 300);
-
-        mostrarMensagem('💔 -1 vida! Restam ' + vidas);
-
-        // Agenda aparição de coração de recuperação
-        agendarCoracao();
     }
 
     // 8. Verifica coleta de coração
