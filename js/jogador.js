@@ -170,10 +170,10 @@ function moverJogador() {
     }
 
     // ---------- LIMITES DA ESTRADA ----------
-    // Impede o jogador de sair da pista e entrar nas calçadas
-    // A calçada tem 130px de cada lado (onde ficam os prédios)
-    let limiteEsquerdo = 135;  // Margem da calçada esquerda
-    let limiteDireito = LARGURA_CANVAS - 135; // Margem da calçada direita
+    // Quando BRT está ativo, jogador pode entrar na faixa BRT
+    // Senão, fica limitado à pista normal
+    let limiteEsquerdo = brtAtivo ? 132 : 182;
+    let limiteDireito = brtAtivo ? LARGURA_CANVAS - 132 : LARGURA_CANVAS - 182;
 
     if (jogador.x < limiteEsquerdo) {
         jogador.x = limiteEsquerdo;

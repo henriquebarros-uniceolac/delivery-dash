@@ -52,6 +52,16 @@ let timerEscudo = null;        // Timer para spawnar escudo
 let ladroes = [];               // Array de ladrões ativos
 let contadorEntregas = 0;       // Conta entregas para saber quando ativar ladrão
 
+// ---------- FAIXA BRT ----------
+let brtAtivo = false;          // Se as faixas BRT estão visíveis agora
+let brtOnibus = [];            // Array de ônibus BRT passando
+let brtTempoRestante = 0;     // Frames restantes da faixa BRT ativa (20s = 1200 frames)
+let brtProximoSpawn = 10800;  // Frames até próxima aparição (3min = 10800 frames a 60fps)
+// Posição X das faixas BRT (coladas nos monumentos)
+const BRT_ESQUERDA_X = 132;
+const BRT_DIREITA_X = 620;
+const BRT_LARGURA = 48;
+
 // ---------- EFEITOS VISUAIS ----------
 let cenarioAtual = null;    // Objeto com cores/efeitos do nível
 let gotasChuva = [];        // Array de gotas de chuva
@@ -160,6 +170,12 @@ function iniciarJogo() {
     // Reseta ladrões
     ladroes = [];
     contadorEntregas = 0;
+
+    // Reseta BRT
+    brtAtivo = false;
+    brtOnibus = [];
+    brtTempoRestante = 0;
+    brtProximoSpawn = 10800; // 3 minutos
 
     // Reseta escudo
     escudoItem = null;
@@ -477,7 +493,41 @@ function loopPrincipal() {
         desenharLadrao(ctx, ladroes[i]);
     }
 
-    // 13. Efeitos visuais do cenário
+    // 13. Sistema BRT
+    atualizarBRT();
+    if (brtAtivo) {
+        // Desenha e move ônibus
+        for (let i = brtOnibus.length - 1; i >= 0; i--) {
+            let bus = brtOnibus[i];
+            bus.y -= bus.velocidade;
+
+            // Saiu da tela
+            if (bus.y + bus.altura < -10) {
+                brtOnibus.splice(i, 1);
+                continue;
+            }
+
+            // Desenha o ônibus BRT
+            desenharBRT(ctx, bus);
+
+            // Colisão com jogador
+            if (framesInvencivel === 0 && !escudoAtivo && verificarColisao(jogador, bus)) {
+                vidas--;
+                if (vidas <= 0) {
+                    gameOver('vidas');
+                    return;
+                }
+                framesInvencivel = CONFIG_VIDAS.invencivel;
+                jogador.y = ALTURA_CANVAS - jogador.altura - 100;
+                canvas.style.boxShadow = '0 0 30px red';
+                setTimeout(function() { canvas.style.boxShadow = 'none'; }, 300);
+                mostrarMensagem('🚌 Atropelado pelo BRT! -1 vida');
+                agendarCoracao();
+            }
+        }
+    }
+
+    // 14. Efeitos visuais do cenário
     desenharEfeitosCenario();
 
     // 11. Atualiza HUD
@@ -529,6 +579,42 @@ function desenharCenario() {
     for (let y = -60 + offsetEstrada; y < ALTURA_CANVAS; y += 60) {
         ctx.fillRect(LARGURA_CANVAS * 0.35, y, 4, 30);
         ctx.fillRect(LARGURA_CANVAS * 0.65, y, 4, 30);
+    }
+
+    // ========== FAIXA EXCLUSIVA BRT ==========
+    if (brtAtivo) {
+        // Faixas cinza nas laterais (coladas nos monumentos)
+        ctx.fillStyle = '#555555';
+        ctx.fillRect(BRT_ESQUERDA_X, 0, BRT_LARGURA, ALTURA_CANVAS);
+        ctx.fillRect(BRT_DIREITA_X, 0, BRT_LARGURA, ALTURA_CANVAS);
+
+        // Linha de separação da faixa BRT
+        ctx.strokeStyle = '#ffcc00';
+        ctx.lineWidth = 3;
+        // Esquerda
+        ctx.setLineDash([15, 10]);
+        ctx.beginPath();
+        ctx.moveTo(BRT_ESQUERDA_X + BRT_LARGURA, 0);
+        ctx.lineTo(BRT_ESQUERDA_X + BRT_LARGURA, ALTURA_CANVAS);
+        ctx.stroke();
+        // Direita
+        ctx.beginPath();
+        ctx.moveTo(BRT_DIREITA_X, 0);
+        ctx.lineTo(BRT_DIREITA_X, ALTURA_CANVAS);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Texto "BRT" na faixa (repetido)
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 11px Arial';
+        ctx.textAlign = 'center';
+        for (let y = 30 + offsetEstrada * 2; y < ALTURA_CANVAS; y += 120) {
+            ctx.fillText('FAIXA', BRT_ESQUERDA_X + BRT_LARGURA / 2, y);
+            ctx.fillText('BRT', BRT_ESQUERDA_X + BRT_LARGURA / 2, y + 14);
+            ctx.fillText('FAIXA', BRT_DIREITA_X + BRT_LARGURA / 2, y);
+            ctx.fillText('BRT', BRT_DIREITA_X + BRT_LARGURA / 2, y + 14);
+        }
+        ctx.textAlign = 'start';
     }
 
     // ========== ARQUITETURA DE BRASÍLIA ==========
@@ -1032,6 +1118,105 @@ function desenharTempoItem(ctx) {
     ctx.textAlign = 'center';
     ctx.fillText('+' + tempoItem.valor + 's', cx, cy + raio + 14);
     ctx.textAlign = 'start';
+}
+
+// ========================================
+// SISTEMA BRT (FAIXA EXCLUSIVA)
+// ========================================
+
+/**
+ * atualizarBRT()
+ * ----------------
+ * Controla o ciclo do BRT:
+ * - Conta até 3 minutos → ativa faixa por 20 segundos
+ * - Durante os 20s, spawna ônibus de vez em quando
+ * - Depois desativa e recomeça a contagem
+ */
+function atualizarBRT() {
+    if (brtAtivo) {
+        brtTempoRestante--;
+
+        // Spawna ônibus a cada ~2-4 segundos (120-240 frames)
+        if (Math.random() < 0.008) {
+            // Escolhe faixa aleatória (esquerda ou direita)
+            let lado = Math.random() < 0.5 ? 'esquerda' : 'direita';
+            let bx = lado === 'esquerda'
+                ? BRT_ESQUERDA_X + 4
+                : BRT_DIREITA_X + 4;
+
+            brtOnibus.push({
+                x: bx,
+                y: ALTURA_CANVAS + 10,
+                largura: BRT_LARGURA - 8,
+                altura: 100,    // Ônibus longo
+                velocidade: 7 + Math.random() * 3,  // Rápido
+                lado: lado
+            });
+        }
+
+        // Acabou os 20 segundos
+        if (brtTempoRestante <= 0) {
+            brtAtivo = false;
+            brtProximoSpawn = 10800; // Próxima em 3 minutos
+            mostrarMensagem('🚌 Faixa BRT liberada!');
+        }
+    } else {
+        // Contagem para próxima ativação
+        brtProximoSpawn--;
+        if (brtProximoSpawn <= 0) {
+            brtAtivo = true;
+            brtTempoRestante = 1200; // 20 segundos
+            brtOnibus = [];
+            mostrarMensagem('🚌 FAIXA BRT ATIVA! Cuidado com os ônibus!');
+        }
+    }
+}
+
+/**
+ * desenharBRT(ctx, bus)
+ * -----------------------
+ * Desenha um ônibus BRT (amarelo, longo, com janelas).
+ */
+function desenharBRT(ctx, bus) {
+    // Corpo do ônibus (amarelo)
+    ctx.fillStyle = '#f0c820';
+    ctx.fillRect(bus.x, bus.y, bus.largura, bus.altura);
+
+    // Teto (mais escuro)
+    ctx.fillStyle = '#d4ac0d';
+    ctx.fillRect(bus.x + 2, bus.y + 2, bus.largura - 4, bus.altura - 4);
+
+    // Janelas (azuis, em duas fileiras)
+    ctx.fillStyle = '#5dade2';
+    for (let j = 0; j < 5; j++) {
+        // Janelas esquerda
+        ctx.fillRect(bus.x + 3, bus.y + 10 + j * 18, 8, 12);
+        // Janelas direita
+        ctx.fillRect(bus.x + bus.largura - 11, bus.y + 10 + j * 18, 8, 12);
+    }
+
+    // Frente do ônibus (para-brisa)
+    ctx.fillStyle = '#2c3e50';
+    ctx.fillRect(bus.x + 4, bus.y + 2, bus.largura - 8, 8);
+
+    // Faróis
+    ctx.fillStyle = '#ffffaa';
+    ctx.fillRect(bus.x + 4, bus.y, 6, 4);
+    ctx.fillRect(bus.x + bus.largura - 10, bus.y, 6, 4);
+
+    // Texto "BRT" no teto
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('BRT', bus.x + bus.largura / 2, bus.y + bus.altura / 2 + 3);
+    ctx.textAlign = 'start';
+
+    // Rodas
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(bus.x - 2, bus.y + 15, 4, 8);
+    ctx.fillRect(bus.x + bus.largura - 2, bus.y + 15, 4, 8);
+    ctx.fillRect(bus.x - 2, bus.y + bus.altura - 20, 4, 8);
+    ctx.fillRect(bus.x + bus.largura - 2, bus.y + bus.altura - 20, 4, 8);
 }
 
 // ========================================
