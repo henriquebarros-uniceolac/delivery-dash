@@ -110,10 +110,12 @@ function criarObstaculo(nivelAtual) {
         velocidade = CONFIG_DIFICULDADE.velocidadeMaxima;
     }
 
-    // Cria o objeto do obstáculo (só na área da estrada: 135px a 665px)
-    let zonaEstrada = LARGURA_CANVAS - 270; // Largura da estrada (sem calçadas)
+    // Cria o obstáculo na pista (evita faixa BRT quando ativa)
+    let xMin = brtAtivo ? 130 + 50 : 130;   // Pula faixa BRT esquerda
+    let xMax = brtAtivo ? 620 : 670;         // Pula faixa BRT direita
+    let zonaEstrada = xMax - xMin;
     let obstaculo = {
-        x: 135 + Math.random() * (zonaEstrada - tipo.largura),  // Posição X na estrada
+        x: xMin + Math.random() * (zonaEstrada - tipo.largura),
         y: -tipo.altura,   // Começa acima da tela (fora do canvas)
         largura: tipo.largura,
         altura: tipo.altura,
@@ -175,7 +177,9 @@ function atualizarObstaculos(nivel) {
         // Se saiu da tela por baixo, reposiciona no topo
         if (obs.y > ALTURA_CANVAS) {
             obs.y = -obs.altura - Math.random() * 100;
-            obs.x = 135 + Math.random() * (LARGURA_CANVAS - 270 - obs.largura);
+            let reXMin = brtAtivo ? 180 : 130;
+            let reXMax = brtAtivo ? 620 : 670;
+            obs.x = reXMin + Math.random() * (reXMax - reXMin - obs.largura);
 
             // Recalcula velocidade (pode ter mudado de nível)
             let tipo = TIPOS_OBSTACULO[obs.tipo];

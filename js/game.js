@@ -53,13 +53,13 @@ let ladroes = [];               // Array de ladrões ativos
 let contadorEntregas = 0;       // Conta entregas para saber quando ativar ladrão
 
 // ---------- FAIXA BRT ----------
-let brtAtivo = false;          // Se as faixas BRT estão visíveis agora
-let brtOnibus = [];            // Array de ônibus BRT passando
-let brtTempoRestante = 0;     // Frames restantes da faixa BRT ativa (20s = 1200 frames)
-let brtProximoSpawn = 10800;  // Frames até próxima aparição (3min = 10800 frames a 60fps)
-// Posição X das faixas BRT (coladas nos monumentos)
-const BRT_ESQUERDA_X = 132;
-const BRT_DIREITA_X = 620;
+let brtAtivo = false;          // Se as faixas BRT estão visíveis
+let brtOnibus = [];            // Ônibus BRT passando
+let brtTempoRestante = 0;     // Frames restantes (20s = 1200)
+let brtProximoSpawn = 1800;   // Frames até aparecer (30s)
+// Faixas BRT: coladas nas calçadas, uma de cada lado
+const BRT_ESQUERDA_X = 130;
+const BRT_DIREITA_X = 622;
 const BRT_LARGURA = 48;
 
 // ---------- EFEITOS VISUAIS ----------
@@ -583,36 +583,18 @@ function desenharCenario() {
 
     // ========== FAIXA EXCLUSIVA BRT ==========
     if (brtAtivo) {
-        // Faixas cinza nas laterais (coladas nos monumentos)
-        ctx.fillStyle = '#555555';
+        // Pinta a faixa cinza por cima do asfalto
+        ctx.fillStyle = '#666666';
         ctx.fillRect(BRT_ESQUERDA_X, 0, BRT_LARGURA, ALTURA_CANVAS);
         ctx.fillRect(BRT_DIREITA_X, 0, BRT_LARGURA, ALTURA_CANVAS);
 
-        // Linha de separação da faixa BRT
-        ctx.strokeStyle = '#ffcc00';
-        ctx.lineWidth = 3;
-        // Esquerda
-        ctx.setLineDash([15, 10]);
-        ctx.beginPath();
-        ctx.moveTo(BRT_ESQUERDA_X + BRT_LARGURA, 0);
-        ctx.lineTo(BRT_ESQUERDA_X + BRT_LARGURA, ALTURA_CANVAS);
-        ctx.stroke();
-        // Direita
-        ctx.beginPath();
-        ctx.moveTo(BRT_DIREITA_X, 0);
-        ctx.lineTo(BRT_DIREITA_X, ALTURA_CANVAS);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Texto "BRT" na faixa (repetido)
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 11px Arial';
+        // Texto "BRT" pintado no chão (desce com a estrada)
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
-        for (let y = 30 + offsetEstrada * 2; y < ALTURA_CANVAS; y += 120) {
-            ctx.fillText('FAIXA', BRT_ESQUERDA_X + BRT_LARGURA / 2, y);
-            ctx.fillText('BRT', BRT_ESQUERDA_X + BRT_LARGURA / 2, y + 14);
-            ctx.fillText('FAIXA', BRT_DIREITA_X + BRT_LARGURA / 2, y);
-            ctx.fillText('BRT', BRT_DIREITA_X + BRT_LARGURA / 2, y + 14);
+        for (let y = offsetEstrada * 2; y < ALTURA_CANVAS + 100; y += 150) {
+            ctx.fillText('BRT', BRT_ESQUERDA_X + BRT_LARGURA / 2, y);
+            ctx.fillText('BRT', BRT_DIREITA_X + BRT_LARGURA / 2, y);
         }
         ctx.textAlign = 'start';
     }

@@ -170,9 +170,9 @@ function moverJogador() {
     }
 
     // ---------- LIMITES DA ESTRADA ----------
-    // Jogador pode andar em toda a pista (entre as calçadas de 130px)
-    let limiteEsquerdo = 135;
-    let limiteDireito = LARGURA_CANVAS - 135;
+    // Jogador anda livremente em toda a pista até a quina da calçada
+    let limiteEsquerdo = 130;
+    let limiteDireito = LARGURA_CANVAS - 130;
 
     if (jogador.x < limiteEsquerdo) {
         jogador.x = limiteEsquerdo;
