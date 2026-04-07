@@ -70,6 +70,13 @@ const TIPOS_OBSTACULO = {
         largura: 28,
         altura: 45,
         velocidadeExtra: 1.5   // Motos são as mais rápidas
+    },
+    poca: {
+        cor: '#2a6090',
+        emoji: '💧',
+        largura: 50,
+        altura: 30,
+        velocidadeExtra: 0     // Poças são estáticas (como buracos)
     }
 };
 
@@ -84,10 +91,11 @@ const TIPOS_OBSTACULO = {
  * @returns {Object} - O obstáculo criado
  */
 function criarObstaculo(nivelAtual) {
-    // Tipos disponíveis mudam conforme o nível
-    // Nível 1-7: carro, buraco, pedestre
-    // Nível 8+: adiciona motos (mais rápidas e finas)
-    let tipos = ['carro', 'buraco', 'pedestre'];
+    // Tipos disponíveis mudam conforme o nível e clima
+    // Com chuva: troca buracos por poças de água
+    // Nível 8+: adiciona motos
+    let temChuva = cenarioAtual && cenarioAtual.chuva;
+    let tipos = temChuva ? ['carro', 'poca', 'pedestre'] : ['carro', 'buraco', 'pedestre'];
     if (nivelAtual >= 8) {
         tipos.push('moto');
     }
@@ -231,6 +239,35 @@ function desenharObstaculos(ctx) {
             ctx.fill();
             // Corpo
             ctx.fillRect(obs.x + 5, obs.y + 16, obs.largura - 10, obs.altura - 16);
+
+        } else if (obs.tipo === 'poca') {
+            // Poça de água: elipse azul com reflexo
+            let pcx = obs.x + obs.largura / 2;
+            let pcy = obs.y + obs.altura / 2;
+
+            // Água
+            ctx.fillStyle = '#1a4a70';
+            ctx.beginPath();
+            ctx.ellipse(pcx, pcy, obs.largura / 2, obs.altura / 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Borda mais clara (ondulação)
+            ctx.strokeStyle = '#3a7ab0';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Reflexo da luz na água
+            ctx.fillStyle = 'rgba(150, 200, 255, 0.4)';
+            ctx.beginPath();
+            ctx.ellipse(pcx - 5, pcy - 3, obs.largura / 4, obs.altura / 5, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ondas na poça
+            ctx.strokeStyle = 'rgba(100, 170, 230, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.ellipse(pcx, pcy, obs.largura / 3, obs.altura / 3, 0, 0, Math.PI * 2);
+            ctx.stroke();
 
         } else if (obs.tipo === 'moto') {
             // Moto obstáculo (visão de cima, detalhada)
