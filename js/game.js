@@ -416,7 +416,7 @@ function loopPrincipal() {
             }
         }
 
-        if (nivelAtual >= 7 && !ladrao) {
+        if (nivelAtual >= 7 && ladroes.length === 0) {
             contadorEntregas++;
         }
 
