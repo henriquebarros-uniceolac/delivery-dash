@@ -6,822 +6,885 @@
     <title>Protótipo - Delivery Dash</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #0a0a1a; color: #fff; padding: 20px; }
-        h1 { text-align: center; color: #e94560; font-size: 2em; margin-bottom: 30px; }
-        h2 { color: #ffd700; margin: 40px 0 15px; text-align: center; font-size: 1.3em; }
-        .container { max-width: 500px; margin: 0 auto; }
-
-        /* Cada tela do protótipo */
-        .tela-proto {
-            border: 3px solid #e94560;
-            border-radius: 20px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            background: #1a1a2e;
-            position: relative;
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0a0a1a 100%);
+            color: #fff;
+            padding: 30px 15px;
+            min-height: 100vh;
         }
 
-        /* Barra do celular */
-        .barra-cel {
-            background: #000;
-            padding: 8px 15px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7em;
-            color: #aaa;
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            color: #e94560;
+            text-shadow: 0 0 30px rgba(233,69,96,0.3);
+            margin-bottom: 5px;
+        }
+        .header .sub {
+            color: #ffd700;
+            font-size: 1.1em;
+        }
+        .header p {
+            color: #888;
+            margin-top: 10px;
+            font-size: 0.9em;
         }
 
-        /* Canvas para desenhar os protótipos */
-        canvas { display: block; width: 100%; }
+        .container { max-width: 900px; margin: 0 auto; }
 
-        /* Setas de anotação */
-        .anotacao {
-            background: rgba(233, 69, 96, 0.15);
-            border: 1px dashed #e94560;
-            border-radius: 8px;
-            padding: 10px 15px;
-            margin: 10px 0;
-            font-size: 0.85em;
-            color: #ccc;
-            line-height: 1.5;
+        /* Seção de cada tela */
+        .secao {
+            margin-bottom: 60px;
         }
-        .anotacao strong { color: #e94560; }
-
-        .legenda {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin: 15px 0;
-        }
-        .legenda-item {
+        .secao-titulo {
             display: flex;
             align-items: center;
-            gap: 5px;
-            font-size: 0.8em;
+            gap: 12px;
+            margin-bottom: 20px;
         }
-        .legenda-cor {
-            width: 16px;
-            height: 16px;
-            border-radius: 3px;
+        .secao-num {
+            background: #e94560;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            flex-shrink: 0;
+        }
+        .secao-titulo h2 {
+            font-size: 1.4em;
+            color: #fff;
+        }
+
+        /* Mockup de celular */
+        .phone {
+            width: 320px;
+            margin: 0 auto;
+            background: #000;
+            border-radius: 35px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 2px #333;
+        }
+        .phone-screen {
+            background: #1a1a2e;
+            border-radius: 25px;
+            overflow: hidden;
+        }
+        .phone-notch {
+            background: #000;
+            width: 120px;
+            height: 22px;
+            border-radius: 0 0 15px 15px;
+            margin: 0 auto;
+            position: relative;
+            top: -1px;
+        }
+        .phone canvas { display: block; width: 100%; }
+
+        /* Layout lado a lado no desktop */
+        .layout-duplo {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .layout-duplo .phone { flex-shrink: 0; }
+        .layout-duplo .descricao {
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+        }
+
+        .descricao h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .descricao p {
+            color: #bbb;
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+        .descricao ul {
+            color: #bbb;
+            margin-left: 20px;
+            margin-bottom: 12px;
+            font-size: 0.9em;
+            line-height: 1.8;
+        }
+        .tag {
+            display: inline-block;
+            background: rgba(233,69,96,0.15);
+            color: #e94560;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin: 2px;
+            border: 1px solid rgba(233,69,96,0.3);
+        }
+        .tag-azul {
+            background: rgba(52,152,219,0.15);
+            color: #3498db;
+            border-color: rgba(52,152,219,0.3);
+        }
+        .tag-verde {
+            background: rgba(46,204,113,0.15);
+            color: #2ecc71;
+            border-color: rgba(46,204,113,0.3);
+        }
+
+        /* Fluxo */
+        .fluxo {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 2em;
+            color: #e94560;
+        }
+
+        /* Legenda de cores */
+        .legenda-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        .legenda-box h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 1em;
+            text-align: center;
+        }
+        .legenda-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+        .leg-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8em;
+            color: #ccc;
+        }
+        .leg-cor {
+            width: 18px; height: 18px;
+            border-radius: 4px;
             border: 1px solid #555;
         }
 
-        @media (max-width: 650px) {
-            body { padding: 10px; }
-            h1 { font-size: 1.5em; }
+        .rodape {
+            text-align: center;
+            color: #444;
+            font-size: 0.8em;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #222;
+        }
+
+        @media (max-width: 700px) {
+            .layout-duplo { flex-direction: column; align-items: center; }
+            .header h1 { font-size: 1.8em; }
+            .phone { width: 280px; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Protótipo — Delivery Dash</h1>
-    <p style="text-align:center; color:#999; margin-bottom:30px;">Modelo visual de como o jogo funciona</p>
 
-    <!-- ============ TELA 1: INÍCIO ============ -->
-    <h2>Tela 1 — Início</h2>
-    <div class="tela-proto">
-        <div class="barra-cel"><span>19:00</span><span>100%</span></div>
-        <canvas id="tela1" width="400" height="550"></canvas>
-    </div>
-    <div class="anotacao">
-        <strong>Tela inicial:</strong> Mostra o título do jogo, a história do Alex (entregador), instruções de como jogar e o botão para começar.
+    <div class="header">
+        <h1>Delivery Dash</h1>
+        <div class="sub">Brasília Edition — Protótipo Visual</div>
+        <p>Modelo de telas e fluxo do jogo</p>
     </div>
 
-    <!-- ============ TELA 2: GAMEPLAY ============ -->
-    <h2>Tela 2 — Gameplay (Dia)</h2>
-    <div class="tela-proto">
-        <div class="barra-cel"><span>19:00</span><span>100%</span></div>
-        <canvas id="tela2" width="400" height="550"></canvas>
+    <!-- ===== TELA 1: INÍCIO ===== -->
+    <div class="secao">
+        <div class="secao-titulo">
+            <div class="secao-num">1</div>
+            <h2>Tela Inicial</h2>
+        </div>
+        <div class="layout-duplo">
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <canvas id="t1" width="296" height="500"></canvas>
+                </div>
+            </div>
+            <div class="descricao">
+                <h3>Primeira impressão</h3>
+                <p>A tela que o jogador vê ao abrir o jogo. Apresenta a história do Alex, as instruções de como jogar e o botão para começar a aventura.</p>
+                <ul>
+                    <li>Título estilizado com brilho</li>
+                    <li>Subtítulo "Brasília Edition"</li>
+                    <li>Resumo da história do jogo</li>
+                    <li>Instruções com ícones</li>
+                    <li>Botão de ação chamativo</li>
+                </ul>
+                <div>
+                    <span class="tag">HTML</span>
+                    <span class="tag">CSS</span>
+                    <span class="tag-azul tag">Flexbox</span>
+                    <span class="tag-azul tag">Gradiente</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="legenda">
-        <div class="legenda-item"><div class="legenda-cor" style="background:#e94560"></div> Moto (jogador)</div>
-        <div class="legenda-item"><div class="legenda-cor" style="background:#e74c3c"></div> Carro</div>
-        <div class="legenda-item"><div class="legenda-cor" style="background:#1a1a1a; border-color:#888"></div> Buraco</div>
-        <div class="legenda-item"><div class="legenda-cor" style="background:#f39c12"></div> Pedestre</div>
-        <div class="legenda-item"><div class="legenda-cor" style="background:#ff6b35"></div> Pedido</div>
-        <div class="legenda-item"><div class="legenda-cor" style="background:#2ecc71"></div> Destino</div>
+    <div class="fluxo">↓</div>
+
+    <!-- ===== TELA 2: GAMEPLAY DIA ===== -->
+    <div class="secao">
+        <div class="secao-titulo">
+            <div class="secao-num">2</div>
+            <h2>Gameplay — Dia Ensolarado</h2>
+        </div>
+        <div class="layout-duplo">
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <canvas id="t2" width="296" height="520"></canvas>
+                </div>
+            </div>
+            <div class="descricao">
+                <h3>Tela principal do jogo</h3>
+                <p>O jogo acontece aqui. A estrada de Brasília desce enquanto Alex desvia de obstáculos e faz entregas.</p>
+                <ul>
+                    <li><strong>HUD:</strong> vidas, tempo, pontos, entregas, nível</li>
+                    <li><strong>Cenário:</strong> estrada + monumentos de Brasília</li>
+                    <li><strong>Obstáculos:</strong> carros coloridos, buracos, pedestres</li>
+                    <li><strong>Pedido:</strong> caixa laranja pulsante</li>
+                    <li><strong>Jogador:</strong> Alex na moto com bag de entrega</li>
+                    <li><strong>Controles:</strong> botões touch (mobile) ou setas</li>
+                </ul>
+                <div>
+                    <span class="tag">Canvas API</span>
+                    <span class="tag">requestAnimationFrame</span>
+                    <span class="tag-azul tag">AABB Colisão</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="anotacao">
-        <strong>Gameplay:</strong> HUD no topo (vidas, tempo, pontos, entregas, nível). Estrada com monumentos de Brasília nas laterais. Obstáculos descendo. Jogador na moto desviando e coletando pedidos.
+    <!-- Legenda -->
+    <div class="legenda-box">
+        <h3>Legenda dos Elementos</h3>
+        <div class="legenda-grid">
+            <div class="leg-item"><div class="leg-cor" style="background:#e94560"></div>Moto do Alex</div>
+            <div class="leg-item"><div class="leg-cor" style="background:#e74c3c"></div>Carro</div>
+            <div class="leg-item"><div class="leg-cor" style="background:#1a1a1a;border-color:#777"></div>Buraco</div>
+            <div class="leg-item"><div class="leg-cor" style="background:#f39c12"></div>Pedestre</div>
+            <div class="leg-item"><div class="leg-cor" style="background:#ff6b35"></div>Pedido</div>
+            <div class="leg-item"><div class="leg-cor" style="background:#2ecc71"></div>Destino</div>
+            <div class="leg-item"><div class="leg-cor" style="background:#00c8ff"></div>Escudo</div>
+            <div class="leg-item"><div class="leg-cor" style="background:#ff2d55"></div>Coração</div>
+            <div class="leg-item"><div class="leg-cor" style="background:#3498db"></div>Relógio</div>
+            <div class="leg-item"><div class="leg-cor" style="background:#1a4a70"></div>Poça</div>
+            <div class="leg-item"><div class="leg-cor" style="background:#f0c820"></div>BRT</div>
+            <div class="leg-item"><div class="leg-cor" style="background:#000;border-color:#f00"></div>Ladrão</div>
+        </div>
     </div>
 
-    <!-- ============ TELA 3: GAMEPLAY NOITE ============ -->
-    <h2>Tela 3 — Gameplay (Noite + Chuva)</h2>
-    <div class="tela-proto">
-        <div class="barra-cel"><span>19:00</span><span>100%</span></div>
-        <canvas id="tela3" width="400" height="550"></canvas>
-    </div>
-    <div class="anotacao">
-        <strong>Nível avançado:</strong> Cenário noturno com chuva. Farol da moto ilumina à frente. Gotas caindo. Alex com capa de chuva preta. Poças na pista invertem os controles.
+    <div class="fluxo">↓</div>
+
+    <!-- ===== TELA 3: NOITE + CHUVA ===== -->
+    <div class="secao">
+        <div class="secao-titulo">
+            <div class="secao-num">3</div>
+            <h2>Gameplay — Noite com Chuva</h2>
+        </div>
+        <div class="layout-duplo">
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <canvas id="t3" width="296" height="520"></canvas>
+                </div>
+            </div>
+            <div class="descricao">
+                <h3>Cenário avançado (Nível 7+)</h3>
+                <p>O cenário muda conforme o nível avança. Na chuva noturna, a visibilidade diminui e novos desafios surgem.</p>
+                <ul>
+                    <li><strong>Noite:</strong> overlay escuro sobre tudo</li>
+                    <li><strong>Farol:</strong> cone de luz à frente da moto</li>
+                    <li><strong>Chuva:</strong> gotas caindo pela tela</li>
+                    <li><strong>Poças:</strong> invertem os controles por 2.5s</li>
+                    <li><strong>Capa de chuva:</strong> Alex troca a roupa verde por preta</li>
+                    <li><strong>Buracos somem</strong>, poças aparecem no lugar</li>
+                </ul>
+                <div>
+                    <span class="tag">Efeitos visuais</span>
+                    <span class="tag-verde tag">Progressão</span>
+                    <span class="tag-azul tag">Controles invertidos</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- ============ TELA 4: POWER-UPS ============ -->
-    <h2>Tela 4 — Itens e Poderes</h2>
-    <div class="tela-proto">
-        <div class="barra-cel"><span>19:00</span><span>100%</span></div>
-        <canvas id="tela4" width="400" height="450"></canvas>
-    </div>
-    <div class="anotacao">
-        <strong>Itens:</strong> Escudo (invencibilidade 6s), coração (recupera vida), relógio (tempo extra). Aparecem na pista em momentos estratégicos.
+    <div class="fluxo">↓</div>
+
+    <!-- ===== TELA 4: ITENS ===== -->
+    <div class="secao">
+        <div class="secao-titulo">
+            <div class="secao-num">4</div>
+            <h2>Itens, Poderes e Eventos</h2>
+        </div>
+        <div class="layout-duplo">
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <canvas id="t4" width="296" height="520"></canvas>
+                </div>
+            </div>
+            <div class="descricao">
+                <h3>Elementos especiais</h3>
+                <p>Itens que aparecem na pista em momentos estratégicos para ajudar (ou atrapalhar) o jogador.</p>
+                <ul>
+                    <li><strong>Escudo:</strong> 6 segundos de invencibilidade total</li>
+                    <li><strong>Coração:</strong> recupera 1 vida perdida</li>
+                    <li><strong>Relógio:</strong> +8 a +10 segundos de tempo</li>
+                    <li><strong>Faixa BRT:</strong> faixa cinza com ônibus rápidos</li>
+                    <li><strong>Ladrão:</strong> moto preta que tenta roubar seu pedido</li>
+                </ul>
+                <div>
+                    <span class="tag">setTimeout</span>
+                    <span class="tag">setInterval</span>
+                    <span class="tag-verde tag">Balanceamento</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- ============ TELA 5: LADRÃO ============ -->
-    <h2>Tela 5 — Ladrão de Pedidos</h2>
-    <div class="tela-proto">
-        <div class="barra-cel"><span>19:00</span><span>100%</span></div>
-        <canvas id="tela5" width="400" height="450"></canvas>
-    </div>
-    <div class="anotacao">
-        <strong>Ladrão:</strong> A partir do nível 7, moto preta aparece atrás do jogador com alerta "LADRÃO!". Tenta roubar o pedido. O jogador precisa desviar para escapar.
+    <div class="fluxo">↓</div>
+
+    <!-- ===== TELA 5: GAME OVER ===== -->
+    <div class="secao">
+        <div class="secao-titulo">
+            <div class="secao-num">5</div>
+            <h2>Game Over</h2>
+        </div>
+        <div class="layout-duplo">
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <canvas id="t5" width="296" height="420"></canvas>
+                </div>
+            </div>
+            <div class="descricao">
+                <h3>Fim de jogo</h3>
+                <p>Aparece quando o tempo acaba ou as vidas chegam a zero. Mostra o resultado e incentiva a jogar de novo.</p>
+                <ul>
+                    <li>Mensagem diferente por motivo (tempo / vidas)</li>
+                    <li>Pontuação total acumulada</li>
+                    <li>Total de entregas feitas</li>
+                    <li>Nível máximo alcançado</li>
+                    <li>Botão "Tentar Novamente" → volta à tela 1</li>
+                </ul>
+                <div>
+                    <span class="tag-verde tag">Loop de gameplay</span>
+                    <span class="tag-verde tag">Retenção</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- ============ TELA 6: GAME OVER ============ -->
-    <h2>Tela 6 — Game Over</h2>
-    <div class="tela-proto">
-        <div class="barra-cel"><span>19:00</span><span>100%</span></div>
-        <canvas id="tela6" width="400" height="400"></canvas>
-    </div>
-    <div class="anotacao">
-        <strong>Game Over:</strong> Mostra motivo (tempo ou vidas), pontuação final, entregas feitas, nível alcançado e botão para tentar novamente.
+    <div class="rodape">
+        Delivery Dash — Protótipo Visual<br>
+        github.com/henrique-uniceplac/delivery-dash
     </div>
 
-    <br>
-    <p style="text-align:center; color:#555; font-size:0.8em;">Delivery Dash — Protótipo Visual</p>
 </div>
 
 <script>
-// ============================================
-// DESENHA TODOS OS PROTÓTIPOS
-// ============================================
+// Helpers
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function rrF(ctx,x,y,w,h,r){rr(ctx,x,y,w,h,r);ctx.fill();}
+function rrS(ctx,x,y,w,h,r){rr(ctx,x,y,w,h,r);ctx.stroke();}
+function wrap(ctx,t,x,y,mw,lh){let w=t.split(' '),l='';for(let i=0;i<w.length;i++){let s=l+w[i]+' ';if(ctx.measureText(s).width>mw&&i>0){ctx.fillText(l,x,y);l=w[i]+' ';y+=lh;}else l=s;}ctx.fillText(l,x,y);}
 
-// --- TELA 1: INÍCIO ---
-(function() {
-    let c = document.getElementById('tela1');
-    let ctx = c.getContext('2d');
+// ===== TELA 1: INÍCIO =====
+(function(){
+let c=document.getElementById('t1'),x=c.getContext('2d');
 
-    // Fundo
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, 400, 550);
+// BG
+x.fillStyle='#1a1a2e';
+x.fillRect(0,0,296,500);
 
-    // Título
-    ctx.fillStyle = '#e94560';
-    ctx.font = 'bold 36px Segoe UI';
-    ctx.textAlign = 'center';
-    ctx.fillText('Delivery Dash', 200, 80);
+// Brilho de fundo
+let g=x.createRadialGradient(148,80,10,148,80,120);
+g.addColorStop(0,'rgba(233,69,96,0.1)');
+g.addColorStop(1,'rgba(0,0,0,0)');
+x.fillStyle=g;
+x.fillRect(0,0,296,200);
 
-    ctx.fillStyle = '#ffd700';
-    ctx.font = '18px Segoe UI';
-    ctx.fillText('Brasília Edition', 200, 110);
+// Emoji moto
+x.font='30px serif';
+x.textAlign='center';
+x.fillText('🏍️',148,45);
 
-    // Caixa da história
-    ctx.fillStyle = 'rgba(255,255,255,0.05)';
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 1;
-    roundRect(ctx, 30, 140, 340, 150, 10);
+// Título
+x.fillStyle='#e94560';
+x.font='bold 26px Segoe UI';
+x.fillText('Delivery Dash',148,82);
+x.fillStyle='#ffd700';
+x.font='14px Segoe UI';
+x.fillText('Brasília Edition',148,102);
 
-    ctx.fillStyle = '#aaa';
-    ctx.font = '13px Segoe UI';
-    ctx.textAlign = 'left';
-    wrapText(ctx, 'Em Brasília, você é Alex, o entregador mais rápido da cidade. Uma tempestade paralisa a metrópole. Sua missão: pilotar sua moto pelas avenidas do Eixo Monumental, desviando de obstáculos e fazendo entregas antes que o tempo acabe!', 45, 165, 310, 18);
+// Linha separadora
+x.strokeStyle='rgba(233,69,96,0.3)';
+x.lineWidth=1;
+x.beginPath();x.moveTo(50,115);x.lineTo(246,115);x.stroke();
 
-    // Instruções
-    ctx.fillStyle = '#e94560';
-    ctx.font = 'bold 16px Segoe UI';
-    ctx.textAlign = 'center';
-    ctx.fillText('Como Jogar', 200, 320);
+// História
+x.fillStyle='rgba(255,255,255,0.05)';
+rrF(x,20,125,256,110,8);
+x.strokeStyle='rgba(255,255,255,0.1)';
+rrS(x,20,125,256,110,8);
 
-    ctx.fillStyle = '#ddd';
-    ctx.font = '13px Segoe UI';
-    ctx.fillText('Setas ou toque na tela para mover', 200, 345);
-    ctx.fillText('Colete pedidos e entregue no destino', 200, 368);
-    ctx.fillText('Desvie dos obstáculos!', 200, 391);
+x.fillStyle='#999';
+x.font='11px Segoe UI';
+x.textAlign='left';
+wrap(x,'Em Brasília, você é Alex, o entregador mais rápido da cidade. Uma tempestade paralisa tudo. Pilote sua moto pelo Eixo Monumental e faça entregas antes que o tempo acabe!',30,143,236,15);
 
-    // Botão
-    let grad = ctx.createLinearGradient(100, 430, 300, 470);
-    grad.addColorStop(0, '#e94560');
-    grad.addColorStop(1, '#c81d4e');
-    ctx.fillStyle = grad;
-    roundRect(ctx, 100, 440, 200, 50, 25, true);
+// Instruções
+x.fillStyle='#e94560';
+x.font='bold 13px Segoe UI';
+x.textAlign='center';
+x.fillText('Como Jogar',148,260);
 
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 18px Segoe UI';
-    ctx.fillText('Começar Entrega!', 200, 472);
+x.fillStyle='#ccc';
+x.font='12px Segoe UI';
+x.fillText('⬅️➡️⬆️⬇️  Setas ou toque',148,282);
+x.fillText('📦  Colete os pedidos',148,302);
+x.fillText('🏠  Entregue no destino',148,322);
+x.fillText('🚗  Desvie dos obstáculos',148,342);
 
-    // Moto decorativa
-    ctx.font = '40px Segoe UI';
-    ctx.fillText('🏍️', 200, 530);
+// Botão
+let bg=x.createLinearGradient(60,380,236,420);
+bg.addColorStop(0,'#e94560');
+bg.addColorStop(1,'#c81d4e');
+x.fillStyle=bg;
+rrF(x,60,385,176,44,22);
+// Sombra do botão
+x.fillStyle='rgba(233,69,96,0.2)';
+rrF(x,65,390,166,44,22);
+x.fillStyle=bg;
+rrF(x,60,385,176,44,22);
+
+x.fillStyle='#fff';
+x.font='bold 15px Segoe UI';
+x.fillText('🚀 Começar Entrega!',148,413);
+
+// Crédito
+x.fillStyle='#444';
+x.font='9px Segoe UI';
+x.fillText('henrique-uniceplac.github.io/delivery-dash',148,480);
 })();
 
-// --- TELA 2: GAMEPLAY DIA ---
-(function() {
-    let c = document.getElementById('tela2');
-    let ctx = c.getContext('2d');
+// ===== TELA 2: GAMEPLAY DIA =====
+(function(){
+let c=document.getElementById('t2'),x=c.getContext('2d');
+let W=296,H=520;
 
-    // HUD
-    ctx.fillStyle = 'rgba(0,0,0,0.9)';
-    ctx.fillRect(0, 0, 400, 40);
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(0, 40); ctx.lineTo(400, 40); ctx.stroke();
+// HUD
+x.fillStyle='rgba(0,0,0,0.95)';
+x.fillRect(0,0,W,36);
+x.strokeStyle='#e94560';x.lineWidth=2;
+x.beginPath();x.moveTo(0,36);x.lineTo(W,36);x.stroke();
 
-    ctx.fillStyle = '#fff';
-    ctx.font = '11px Segoe UI';
-    ctx.textAlign = 'center';
-    ctx.fillText('❤️❤️❤️❤️❤️', 55, 18);
-    ctx.fillText('⏱️ 28s', 140, 18);
-    ctx.fillText('⭐ 300', 210, 18);
-    ctx.fillText('📦 3', 275, 18);
-    ctx.fillText('Nv.2', 340, 18);
-    ctx.fillText('Brasília', 340, 33);
+x.fillStyle='#fff';x.font='9px Segoe UI';x.textAlign='center';
+x.fillText('❤️❤️❤️❤️❤️',48,15);
+x.fillText('⏱️32s',110,15);
+x.fillText('⭐200',162,15);
+x.fillText('📦2',210,15);
+x.fillText('Brasília',260,15);
+x.fillText('Nv.1',260,28);
 
-    // Grama
-    ctx.fillStyle = '#2d5a1e';
-    ctx.fillRect(0, 40, 400, 510);
+// Grama
+x.fillStyle='#2d5a1e';x.fillRect(0,36,W,H-36);
+// Calçadas
+x.fillStyle='#c4b9a0';x.fillRect(0,36,48,H);x.fillRect(W-48,36,48,H);
+// Estrada
+x.fillStyle='#3d3d3d';x.fillRect(48,36,W-96,H-36);
 
-    // Calçadas
-    ctx.fillStyle = '#c4b9a0';
-    ctx.fillRect(0, 40, 65, 510);
-    ctx.fillRect(335, 40, 65, 510);
+// Faixas
+x.fillStyle='#fff';
+for(let y=40;y<H;y+=35){x.fillRect(W/2-1,y,2,18);}
+x.fillRect(49,36,2,H);x.fillRect(W-51,36,2,H);
+for(let y=40;y<H;y+=35){x.fillRect(W*0.35,y,2,18);x.fillRect(W*0.65,y,2,18);}
 
-    // Estrada
-    ctx.fillStyle = '#3d3d3d';
-    ctx.fillRect(65, 40, 270, 510);
+// Ministério esquerdo
+x.fillStyle='#e8e0d0';x.fillRect(3,70,42,35);
+x.fillStyle='#5a8faf';
+for(let i=0;i<3;i++)x.fillRect(7+i*14,75,9,7);
+x.fillStyle='#b0a89a';
+for(let i=0;i<3;i++)x.fillRect(8+i*15,97,3,8);
 
-    // Faixas
-    ctx.fillStyle = '#fff';
-    for (let y = 50; y < 550; y += 40) {
-        ctx.fillRect(198, y, 3, 20);
-    }
-    ctx.fillRect(67, 40, 2, 510);
-    ctx.fillRect(331, 40, 2, 510);
+// Congresso direito
+x.fillStyle='#e8e0d0';x.fillRect(W-45,90,42,20);
+x.fillStyle='#d0c8b8';
+x.fillRect(W-32,70,5,30);x.fillRect(W-22,70,5,30);
+x.beginPath();x.arc(W-14,90,8,Math.PI,0);x.fill();
+x.beginPath();x.arc(W-38,88,8,0,Math.PI);x.fill();
 
-    // Ministério esquerdo
-    ctx.fillStyle = '#e8e0d0';
-    ctx.fillRect(5, 80, 55, 40);
-    ctx.fillStyle = '#5a8faf';
-    for (let i = 0; i < 3; i++) {
-        ctx.fillRect(10 + i * 18, 85, 12, 8);
-    }
+// Catedral esquerda
+x.fillStyle='rgba(70,150,220,0.4)';
+x.beginPath();x.moveTo(10,210);x.quadraticCurveTo(24,170,38,210);x.fill();
+x.fillStyle='#c0a030';x.fillRect(22,175,2,10);x.fillRect(20,178,6,2);
 
-    // Congresso direito
-    ctx.fillStyle = '#e8e0d0';
-    ctx.fillRect(340, 80, 55, 40);
-    ctx.fillStyle = '#d0c8b8';
-    ctx.fillRect(358, 65, 6, 30);
-    ctx.fillRect(370, 65, 6, 30);
-    ctx.beginPath();
-    ctx.arc(385, 92, 10, Math.PI, 0);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(350, 90, 10, 0, Math.PI);
-    ctx.fill();
+// Palácio direito
+x.fillStyle='#e8e0d0';x.fillRect(W-44,220,40,25);
+x.fillStyle='#5a8faf';x.fillRect(W-42,224,36,16);
 
-    // Ministério esquerdo 2
-    ctx.fillStyle = '#e8e0d0';
-    ctx.fillRect(5, 250, 55, 40);
-    ctx.fillStyle = '#5a8faf';
-    for (let i = 0; i < 3; i++) {
-        ctx.fillRect(10 + i * 18, 255, 12, 8);
-    }
+// Ministério esquerdo 2
+x.fillStyle='#e8e0d0';x.fillRect(3,320,42,35);
+x.fillStyle='#5a8faf';
+for(let i=0;i<3;i++)x.fillRect(7+i*14,325,9,7);
 
-    // Palácio direito
-    ctx.fillStyle = '#e8e0d0';
-    ctx.fillRect(340, 250, 55, 35);
-    ctx.fillStyle = '#5a8faf';
-    ctx.fillRect(345, 255, 45, 20);
+// Carro vermelho
+x.fillStyle='#e74c3c';x.fillRect(90,130,28,38);
+x.fillStyle='#87CEEB';x.fillRect(93,135,22,8);
+x.fillStyle='#333';
+x.fillRect(88,134,3,6);x.fillRect(117,134,3,6);
+x.fillRect(88,158,3,6);x.fillRect(117,158,3,6);
 
-    // Carro vermelho
-    ctx.fillStyle = '#e74c3c';
-    ctx.fillRect(120, 150, 30, 40);
-    ctx.fillStyle = '#87CEEB';
-    ctx.fillRect(124, 156, 22, 8);
-    ctx.fillStyle = '#333';
-    ctx.fillRect(118, 155, 4, 7);
-    ctx.fillRect(148, 155, 4, 7);
-    ctx.fillRect(118, 180, 4, 7);
-    ctx.fillRect(148, 180, 4, 7);
+// Carro azul
+x.fillStyle='#3498db';x.fillRect(185,240,28,38);
+x.fillStyle='#87CEEB';x.fillRect(188,245,22,8);
+x.fillStyle='#333';
+x.fillRect(183,244,3,6);x.fillRect(212,244,3,6);
 
-    // Carro azul
-    ctx.fillStyle = '#3498db';
-    ctx.fillRect(250, 280, 30, 40);
-    ctx.fillStyle = '#87CEEB';
-    ctx.fillRect(254, 286, 22, 8);
-    ctx.fillStyle = '#333';
-    ctx.fillRect(248, 285, 4, 7);
-    ctx.fillRect(278, 285, 4, 7);
+// Carro verde
+x.fillStyle='#2ecc71';x.fillRect(130,330,28,38);
+x.fillStyle='#87CEEB';x.fillRect(133,335,22,8);
 
-    // Buraco
-    ctx.fillStyle = '#1a1a1a';
-    ctx.beginPath();
-    ctx.ellipse(170, 320, 18, 10, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#555';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+// Buraco
+x.fillStyle='#1a1a1a';
+x.beginPath();x.ellipse(220,150,14,8,0,0,Math.PI*2);x.fill();
+x.strokeStyle='#555';x.lineWidth=1;x.stroke();
 
-    // Pedestre
-    ctx.fillStyle = '#f39c12';
-    ctx.beginPath();
-    ctx.arc(280, 180, 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillRect(275, 186, 10, 15);
+// Pedestre
+x.fillStyle='#f39c12';
+x.beginPath();x.arc(75,280,5,0,Math.PI*2);x.fill();
+x.fillRect(71,285,8,12);
 
-    // Pedido
-    ctx.fillStyle = '#ff6b35';
-    ctx.fillRect(240, 380, 20, 20);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(249, 380, 2, 20);
-    ctx.fillRect(240, 389, 20, 2);
-    ctx.font = 'bold 9px Segoe UI';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#fff';
-    ctx.fillText('PEDIDO', 250, 375);
+// Destino
+x.fillStyle='#2ecc71';x.fillRect(195,90,22,22);
+x.fillStyle='#fff';
+x.beginPath();x.moveTo(195,100);x.lineTo(206,85);x.lineTo(217,100);x.closePath();x.fill();
+x.fillStyle='#1a5c2e';x.fillRect(203,102,6,10);
+x.fillStyle='#fff';x.font='bold 8px Segoe UI';x.textAlign='center';
+x.fillText('ENTREGA',206,82);
 
-    // Jogador (moto + Alex)
-    let px = 185, py = 430;
-    // Moto
-    ctx.fillStyle = '#e94560';
-    ctx.fillRect(px - 3, py + 5, 16, 30);
-    // Capacete
-    ctx.fillStyle = '#e94560';
-    ctx.beginPath();
-    ctx.arc(px + 5, py + 4, 5, 0, Math.PI * 2);
-    ctx.fill();
-    // Corpo
-    ctx.fillStyle = '#00b894';
-    ctx.fillRect(px - 2, py + 5, 14, 10);
-    // Guidão
-    ctx.fillStyle = '#888';
-    ctx.fillRect(px - 8, py + 8, 26, 2);
-    // Rodas
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.ellipse(px + 5, py, 4, 3, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(px + 5, py + 35, 5, 3, 0, 0, Math.PI * 2);
-    ctx.fill();
+// Pedido
+x.fillStyle='#ff6b35';x.fillRect(100,380,18,18);
+x.fillStyle='#fff';x.fillRect(108,380,2,18);x.fillRect(100,388,18,2);
+x.fillStyle='#fff';x.font='bold 7px Segoe UI';
+x.fillText('PEDIDO',109,375);
 
-    // Bag
-    ctx.fillStyle = '#ff6b35';
-    ctx.fillRect(px - 3, py + 14, 16, 10);
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 6px Arial';
-    ctx.fillText('iFood', px + 5, py + 22);
+// Alex na moto
+let px=145,py=410;
+// Roda traseira
+x.fillStyle='#111';x.beginPath();x.ellipse(px,py+32,6,4,0,0,Math.PI*2);x.fill();
+// Chassi
+x.fillStyle='#e94560';
+x.beginPath();x.moveTo(px-4,py+28);x.lineTo(px+4,py+28);x.lineTo(px+3,py+10);x.lineTo(px-3,py+10);x.closePath();x.fill();
+// Assento
+x.fillStyle='#2a2a2a';x.fillRect(px-3,py+18,6,6);
+// Tanque
+x.fillStyle='#c81d4e';x.beginPath();x.ellipse(px,py+14,4,3,0,0,Math.PI*2);x.fill();
+// Corpo Alex
+x.fillStyle='#00b894';x.fillRect(px-6,py+5,12,10);
+// Braços
+x.fillRect(px-10,py+7,5,3);x.fillRect(px+5,py+7,5,3);
+// Capacete
+x.fillStyle='#e94560';x.beginPath();x.arc(px,py+2,5,0,Math.PI*2);x.fill();
+x.fillStyle='#333';x.beginPath();x.arc(px,py+3,3.5,-0.5,Math.PI+0.5);x.fill();
+// Guidão
+x.fillStyle='#888';x.fillRect(px-11,py+8,22,2);
+x.fillStyle='#333';x.fillRect(px-12,py+7,3,4);x.fillRect(px+9,py+7,3,4);
+// Roda dianteira
+x.fillStyle='#111';x.beginPath();x.ellipse(px,py-2,5,3,0,0,Math.PI*2);x.fill();
+// Bag
+x.fillStyle='#ff6b35';x.fillRect(px-7,py+15,14,10);
+x.fillStyle='#fff';x.font='bold 5px Arial';x.fillText('iFood',px,py+22);
 
-    // Controles mobile
-    ctx.fillStyle = 'rgba(255,255,255,0.12)';
-    roundRect(ctx, 170, 490, 45, 45, 8, true);
-    roundRect(ctx, 120, 500, 45, 45, 8, true);
-    roundRect(ctx, 170, 500, 45, 45, 8, true);
-    roundRect(ctx, 220, 500, 45, 45, 8, true);
+// Controles
+x.fillStyle='rgba(255,255,255,0.1)';
+rrF(x,120,465,40,40,8);rrF(x,75,478,40,40,8);rrF(x,120,478,40,40,8);rrF(x,165,478,40,40,8);
+x.fillStyle='rgba(255,255,255,0.4)';x.font='16px Segoe UI';
+x.fillText('▲',140,492);x.fillText('◄',95,505);x.fillText('▼',140,505);x.fillText('►',185,505);
 
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.font = '18px Segoe UI';
-    ctx.fillText('▲', 193, 520);
-    ctx.fillText('◄', 143, 530);
-    ctx.fillText('▼', 193, 530);
-    ctx.fillText('►', 243, 530);
-
-    ctx.textAlign = 'start';
+x.textAlign='start';
 })();
 
-// --- TELA 3: GAMEPLAY NOITE + CHUVA ---
-(function() {
-    let c = document.getElementById('tela3');
-    let ctx = c.getContext('2d');
+// ===== TELA 3: NOITE + CHUVA =====
+(function(){
+let c=document.getElementById('t3'),x=c.getContext('2d');
+let W=296,H=520;
 
-    // HUD
-    ctx.fillStyle = 'rgba(0,0,0,0.9)';
-    ctx.fillRect(0, 0, 400, 40);
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(0, 40); ctx.lineTo(400, 40); ctx.stroke();
+// HUD
+x.fillStyle='rgba(0,0,0,0.95)';x.fillRect(0,0,W,36);
+x.strokeStyle='#e94560';x.lineWidth=2;
+x.beginPath();x.moveTo(0,36);x.lineTo(W,36);x.stroke();
+x.fillStyle='#fff';x.font='9px Segoe UI';x.textAlign='center';
+x.fillText('❤️❤️❤️🖤🖤',48,15);
+x.fillText('⏱️14s',110,15);
+x.fillText('⭐900',162,15);
+x.fillText('📦9',210,15);
+x.fillText('Brasília',260,15);x.fillText('Nv.7',260,28);
 
-    ctx.fillStyle = '#fff';
-    ctx.font = '11px Segoe UI';
-    ctx.textAlign = 'center';
-    ctx.fillText('❤️❤️❤️🖤🖤', 55, 18);
-    ctx.fillText('⏱️ 12s', 140, 18);
-    ctx.fillText('⭐ 800', 210, 18);
-    ctx.fillText('📦 8', 275, 18);
-    ctx.fillText('Nv.7', 340, 18);
+// Fundo noturno
+x.fillStyle='#0d2a0e';x.fillRect(0,36,W,H);
+x.fillStyle='#3a3a2a';x.fillRect(0,36,48,H);x.fillRect(W-48,36,48,H);
+x.fillStyle='#1a1a1a';x.fillRect(48,36,W-96,H-36);
 
-    // Fundo noturno
-    ctx.fillStyle = '#0d2a0e';
-    ctx.fillRect(0, 40, 400, 510);
+// Faixas escuras
+x.fillStyle='#555';
+for(let y=40;y<H;y+=35)x.fillRect(W/2-1,y,2,18);
 
-    // Calçadas escuras
-    ctx.fillStyle = '#3a3a2a';
-    ctx.fillRect(0, 40, 65, 510);
-    ctx.fillRect(335, 40, 65, 510);
+// Poça
+x.fillStyle='#1a4a70';
+x.beginPath();x.ellipse(130,220,20,10,0,0,Math.PI*2);x.fill();
+x.fillStyle='rgba(150,200,255,0.3)';
+x.beginPath();x.ellipse(126,218,8,4,0,0,Math.PI*2);x.fill();
+x.strokeStyle='rgba(100,170,230,0.3)';x.lineWidth=1;
+x.beginPath();x.ellipse(130,220,12,6,0,0,Math.PI*2);x.stroke();
 
-    // Estrada escura
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillRect(65, 40, 270, 510);
+// Carro branco
+x.fillStyle='#ddd';x.fillRect(180,160,28,38);
+x.fillStyle='#87CEEB';x.fillRect(183,165,22,8);
 
-    // Faixas
-    ctx.fillStyle = '#666';
-    for (let y = 50; y < 550; y += 40) {
-        ctx.fillRect(198, y, 3, 20);
-    }
+// Moto obstáculo
+x.fillStyle='#ff4444';
+x.fillRect(95,310,8,28);
+x.fillStyle='#ff4444';x.beginPath();x.arc(99,300,4,0,Math.PI*2);x.fill();
+x.fillStyle='#111';x.beginPath();x.ellipse(99,340,5,3,0,0,Math.PI*2);x.fill();
 
-    // Poça de água
-    ctx.fillStyle = '#1a4a70';
-    ctx.beginPath();
-    ctx.ellipse(160, 250, 25, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(150,200,255,0.3)';
-    ctx.beginPath();
-    ctx.ellipse(155, 248, 10, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = '9px Segoe UI';
-    ctx.fillText('POÇA', 160, 275);
+// Alex com capa preta
+let px=148,py=380;
+x.fillStyle='#111';x.beginPath();x.ellipse(px,py+32,6,4,0,0,Math.PI*2);x.fill();
+x.fillStyle='#e94560';
+x.beginPath();x.moveTo(px-4,py+28);x.lineTo(px+4,py+28);x.lineTo(px+3,py+10);x.lineTo(px-3,py+10);x.closePath();x.fill();
+// Capa preta
+x.fillStyle='#1a1a1a';x.fillRect(px-6,py+5,12,10);
+x.fillStyle='#1a1a1a';x.beginPath();x.arc(px,py+2,6,0,Math.PI*2);x.fill();
+x.fillStyle='#333';x.beginPath();x.arc(px,py+2,5,0,Math.PI*2);x.fill();
+x.fillStyle='#111';x.beginPath();x.arc(px,py+3,3.5,-0.5,Math.PI+0.5);x.fill();
+x.fillStyle='#888';x.fillRect(px-11,py+8,22,2);
+x.fillStyle='#111';x.beginPath();x.ellipse(px,py-2,5,3,0,0,Math.PI*2);x.fill();
 
-    // Carro
-    ctx.fillStyle = '#ecf0f1';
-    ctx.fillRect(250, 180, 30, 40);
-    ctx.fillStyle = '#87CEEB';
-    ctx.fillRect(254, 186, 22, 8);
+// Farol
+x.fillStyle='rgba(255,255,200,0.12)';
+x.beginPath();x.moveTo(px-3,py);x.lineTo(px-28,py-90);x.lineTo(px+28,py-90);x.lineTo(px+3,py);x.closePath();x.fill();
 
-    // Jogador com capa
-    let px = 180, py = 380;
-    ctx.fillStyle = '#e94560';
-    ctx.fillRect(px - 3, py + 5, 16, 30);
-    ctx.fillStyle = '#1a1a1a'; // Capa preta
-    ctx.fillRect(px - 2, py + 5, 14, 10);
-    ctx.fillStyle = '#333'; // Capacete escuro
-    ctx.beginPath();
-    ctx.arc(px + 5, py + 4, 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#888';
-    ctx.fillRect(px - 8, py + 8, 26, 2);
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.ellipse(px + 5, py + 35, 5, 3, 0, 0, Math.PI * 2);
-    ctx.fill();
+// Escuridão
+x.fillStyle='rgba(0,0,10,0.25)';x.fillRect(0,36,W,H);
 
-    // Farol
-    ctx.fillStyle = 'rgba(255,255,200,0.15)';
-    ctx.beginPath();
-    ctx.moveTo(px, py);
-    ctx.lineTo(px - 25, py - 80);
-    ctx.lineTo(px + 35, py - 80);
-    ctx.lineTo(px + 10, py);
-    ctx.closePath();
-    ctx.fill();
+// Chuva
+x.strokeStyle='rgba(150,180,255,0.35)';x.lineWidth=1;
+for(let i=0;i<50;i++){let gx=Math.random()*W,gy=36+Math.random()*(H-36);
+x.beginPath();x.moveTo(gx,gy);x.lineTo(gx-1,gy+8+Math.random()*6);x.stroke();}
 
-    // Chuva
-    ctx.strokeStyle = 'rgba(150,180,255,0.4)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 60; i++) {
-        let gx = Math.random() * 400;
-        let gy = 40 + Math.random() * 500;
-        ctx.beginPath();
-        ctx.moveTo(gx, gy);
-        ctx.lineTo(gx - 1, gy + 10);
-        ctx.stroke();
-    }
-
-    // Escuridão
-    ctx.fillStyle = 'rgba(0,0,10,0.25)';
-    ctx.fillRect(0, 40, 400, 510);
-
-    // Texto indicativo
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.font = '10px Segoe UI';
-    ctx.fillText('Chuva + Noite', 200, 55);
-
-    ctx.textAlign = 'start';
+x.textAlign='start';
 })();
 
-// --- TELA 4: ITENS ---
-(function() {
-    let c = document.getElementById('tela4');
-    let ctx = c.getContext('2d');
+// ===== TELA 4: ITENS =====
+(function(){
+let c=document.getElementById('t4'),x=c.getContext('2d');
+let W=296,H=520;
 
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, 400, 450);
+x.fillStyle='#1a1a2e';x.fillRect(0,0,W,H);
 
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 16px Segoe UI';
-    ctx.textAlign = 'center';
-    ctx.fillText('Itens e Power-Ups', 200, 35);
+x.textAlign='center';
 
-    // Escudo
-    let sx = 80, sy = 90;
-    ctx.fillStyle = 'rgba(0,200,255,0.2)';
-    ctx.beginPath();
-    ctx.arc(sx, sy, 30, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#00c8ff';
-    ctx.beginPath();
-    ctx.moveTo(sx, sy - 22);
-    ctx.lineTo(sx + 22, sy - 5);
-    ctx.lineTo(sx + 15, sy + 18);
-    ctx.lineTo(sx, sy + 24);
-    ctx.lineTo(sx - 15, sy + 18);
-    ctx.lineTo(sx - 22, sy - 5);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 16px Segoe UI';
-    ctx.fillText('★', sx, sy + 5);
-    ctx.font = '12px Segoe UI';
-    ctx.fillText('Escudo', sx, sy + 48);
-    ctx.fillStyle = '#aaa';
-    ctx.font = '10px Segoe UI';
-    ctx.fillText('6s invencível', sx, sy + 63);
+// Título
+x.fillStyle='#ffd700';x.font='bold 16px Segoe UI';
+x.fillText('Itens e Poderes',W/2,30);
 
-    // Coração
-    let hx = 200, hy = 90;
-    ctx.fillStyle = 'rgba(255,50,50,0.2)';
-    ctx.beginPath();
-    ctx.arc(hx, hy, 30, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#ff2d55';
-    ctx.beginPath();
-    ctx.moveTo(hx, hy + 15);
-    ctx.bezierCurveTo(hx - 20, hy, hx - 20, hy - 15, hx, hy - 5);
-    ctx.bezierCurveTo(hx + 20, hy - 15, hx + 20, hy, hx, hy + 15);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px Segoe UI';
-    ctx.fillText('Coração', hx, hy + 48);
-    ctx.fillStyle = '#aaa';
-    ctx.font = '10px Segoe UI';
-    ctx.fillText('+1 vida', hx, hy + 63);
+// --- Escudo ---
+let y1=70;
+x.fillStyle='rgba(0,200,255,0.15)';x.beginPath();x.arc(60,y1,28,0,Math.PI*2);x.fill();
+x.fillStyle='#00c8ff';
+x.beginPath();x.moveTo(60,y1-18);x.lineTo(78,y1-4);x.lineTo(72,y1+14);x.lineTo(60,y1+20);x.lineTo(48,y1+14);x.lineTo(42,y1-4);x.closePath();x.fill();
+x.strokeStyle='#fff';x.lineWidth=1.5;x.stroke();
+x.fillStyle='#fff';x.font='bold 14px Segoe UI';x.fillText('★',60,y1+4);
+x.font='bold 10px Segoe UI';x.fillText('Escudo',60,y1+38);
+x.fillStyle='#888';x.font='9px Segoe UI';x.fillText('6s invencível',60,y1+50);
 
-    // Relógio
-    let tx = 320, ty = 90;
-    ctx.fillStyle = 'rgba(52,152,219,0.2)';
-    ctx.beginPath();
-    ctx.arc(tx, ty, 30, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#3498db';
-    ctx.beginPath();
-    ctx.arc(tx, ty, 20, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(tx, ty);
-    ctx.lineTo(tx, ty - 12);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(tx, ty);
-    ctx.lineTo(tx + 8, ty);
-    ctx.stroke();
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px Segoe UI';
-    ctx.fillText('Relógio', tx, ty + 48);
-    ctx.fillStyle = '#aaa';
-    ctx.font = '10px Segoe UI';
-    ctx.fillText('+8-10s tempo', tx, ty + 63);
+// --- Coração ---
+x.fillStyle='rgba(255,50,50,0.15)';x.beginPath();x.arc(148,y1,28,0,Math.PI*2);x.fill();
+x.fillStyle='#ff2d55';
+x.beginPath();x.moveTo(148,y1+14);x.bezierCurveTo(132,y1,132,y1-14,148,y1-4);x.bezierCurveTo(164,y1-14,164,y1,148,y1+14);x.fill();
+x.fillStyle='#fff';x.font='bold 10px Segoe UI';x.fillText('Coração',148,y1+38);
+x.fillStyle='#888';x.font='9px Segoe UI';x.fillText('+1 vida',148,y1+50);
 
-    // Moto com escudo ativo
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 14px Segoe UI';
-    ctx.fillText('Escudo Ativo', 200, 210);
+// --- Relógio ---
+x.fillStyle='rgba(52,152,219,0.15)';x.beginPath();x.arc(236,y1,28,0,Math.PI*2);x.fill();
+x.fillStyle='#3498db';x.beginPath();x.arc(236,y1,16,0,Math.PI*2);x.fill();
+x.strokeStyle='#fff';x.lineWidth=1.5;x.stroke();
+x.beginPath();x.moveTo(236,y1);x.lineTo(236,y1-10);x.stroke();
+x.beginPath();x.moveTo(236,y1);x.lineTo(243,y1);x.stroke();
+x.fillStyle='#fff';x.font='bold 10px Segoe UI';x.fillText('Relógio',236,y1+38);
+x.fillStyle='#888';x.font='9px Segoe UI';x.fillText('+8 a +10s',236,y1+50);
 
-    let mx = 200, my = 290;
-    // Aura
-    ctx.strokeStyle = 'rgba(0,200,255,0.5)';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.ellipse(mx, my, 30, 35, 0, 0, Math.PI * 2);
-    ctx.stroke();
+// Linha
+x.strokeStyle='#333';x.lineWidth=1;
+x.beginPath();x.moveTo(20,145);x.lineTo(W-20,145);x.stroke();
 
-    // Moto
-    ctx.fillStyle = '#e94560';
-    ctx.fillRect(mx - 5, my - 10, 10, 25);
-    ctx.fillStyle = '#00b894';
-    ctx.fillRect(mx - 5, my - 10, 10, 8);
-    ctx.fillStyle = '#e94560';
-    ctx.beginPath();
-    ctx.arc(mx, my - 13, 4, 0, Math.PI * 2);
-    ctx.fill();
+// --- Escudo ativo ---
+x.fillStyle='#fff';x.font='bold 12px Segoe UI';
+x.fillText('Escudo Ativo no Jogador',W/2,170);
 
-    // Barra de duração
-    ctx.fillStyle = 'rgba(0,200,255,0.5)';
-    ctx.fillRect(mx - 20, my + 22, 30, 4);
-    ctx.fillStyle = '#aaa';
-    ctx.font = '9px Segoe UI';
-    ctx.fillText('← barra de duração', mx, my + 40);
+let mx=W/2,my=220;
+// Aura
+x.strokeStyle='rgba(0,200,255,0.5)';x.lineWidth=2;
+x.beginPath();x.ellipse(mx,my,22,28,0,0,Math.PI*2);x.stroke();
+x.strokeStyle='rgba(0,200,255,0.25)';
+x.beginPath();x.ellipse(mx,my,26,32,0,0,Math.PI*2);x.stroke();
+// Moto mini
+x.fillStyle='#e94560';x.fillRect(mx-3,my-8,6,20);
+x.fillStyle='#00b894';x.fillRect(mx-4,my-8,8,6);
+x.fillStyle='#e94560';x.beginPath();x.arc(mx,my-10,3,0,Math.PI*2);x.fill();
+// Barra
+x.fillStyle='rgba(0,200,255,0.4)';x.fillRect(mx-15,my+24,22,3);
+x.fillStyle='rgba(0,200,255,0.15)';x.fillRect(mx+7,my+24,8,3);
+x.fillStyle='#777';x.font='8px Segoe UI';x.fillText('barra de duração',mx,my+40);
 
-    // BRT
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 14px Segoe UI';
-    ctx.fillText('Faixa BRT', 200, 370);
+// Linha
+x.strokeStyle='#333';x.lineWidth=1;
+x.beginPath();x.moveTo(20,275);x.lineTo(W-20,275);x.stroke();
 
-    ctx.fillStyle = '#666';
-    ctx.fillRect(50, 390, 300, 40);
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.font = 'bold 14px Segoe UI';
-    ctx.fillText('BRT', 120, 415);
-    ctx.fillText('BRT', 280, 415);
+// --- BRT ---
+x.fillStyle='#fff';x.font='bold 12px Segoe UI';
+x.fillText('Faixa Exclusiva BRT',W/2,300);
 
-    // Ônibus
-    ctx.fillStyle = '#f0c820';
-    ctx.fillRect(170, 392, 25, 36);
-    ctx.fillStyle = '#5dade2';
-    ctx.fillRect(173, 398, 5, 6);
-    ctx.fillRect(173, 408, 5, 6);
-    ctx.fillRect(188, 398, 5, 6);
-    ctx.fillRect(188, 408, 5, 6);
+// Faixa
+x.fillStyle='#3d3d3d';x.fillRect(30,315,236,80);
+x.fillStyle='#666';x.fillRect(30,315,45,80);x.fillRect(221,315,45,80);
+x.fillStyle='rgba(255,255,255,0.3)';x.font='bold 10px Segoe UI';
+x.fillText('BRT',52,360);x.fillText('BRT',243,360);
 
-    ctx.fillStyle = '#aaa';
-    ctx.font = '9px Segoe UI';
-    ctx.fillText('Ônibus amarelo passa rápido', 200, 445);
+// Ônibus
+x.fillStyle='#f0c820';x.fillRect(35,325,35,60);
+x.fillStyle='#d4ac0d';x.fillRect(37,327,31,56);
+x.fillStyle='#5dade2';
+for(let i=0;i<3;i++){x.fillRect(38,332+i*16,6,10);x.fillRect(60,332+i*16,6,10);}
+x.fillStyle='#333';x.font='bold 7px Segoe UI';x.fillText('BRT',52,360);
 
-    ctx.textAlign = 'start';
+// Moto na pista
+x.fillStyle='#e94560';x.fillRect(145,340,6,16);
+x.fillStyle='#00b894';x.fillRect(143,340,10,5);
+
+x.fillStyle='#888';x.font='8px Segoe UI';
+x.fillText('Ônibus passa rápido pela faixa',W/2,408);
+
+// Linha
+x.strokeStyle='#333';x.lineWidth=1;
+x.beginPath();x.moveTo(20,425);x.lineTo(W-20,425);x.stroke();
+
+// --- Ladrão ---
+x.fillStyle='#fff';x.font='bold 12px Segoe UI';
+x.fillText('Ladrão de Pedidos (Nv.7+)',W/2,448);
+
+// Alex
+let ax=120,ay=480;
+x.fillStyle='#e94560';x.fillRect(ax-2,ay,6,14);
+x.fillStyle='#00b894';x.fillRect(ax-3,ay,8,5);
+x.fillStyle='#ff6b35';x.fillRect(ax-4,ay+5,10,6);
+x.fillStyle='#fff';x.font='7px Segoe UI';x.fillText('Alex',ax,ay+24);
+
+// Seta
+x.strokeStyle='#e94560';x.lineWidth=1;x.setLineDash([3,3]);
+x.beginPath();x.moveTo(ax+15,ay+5);x.lineTo(ax+40,ay+5);x.stroke();
+x.setLineDash([]);
+
+// Ladrão
+let bx=175,by=478;
+x.fillStyle='#111';x.fillRect(bx-2,by,6,14);
+x.fillStyle='#000';x.beginPath();x.arc(bx+1,by-2,4,0,Math.PI*2);x.fill();
+x.fillStyle='#f00';x.fillRect(bx-1,by-3,2,1.5);x.fillRect(bx+2,by-3,2,1.5);
+// Mão
+x.fillStyle='#8B6914';x.fillRect(bx-8,by+3,7,2);
+// Alerta
+x.fillStyle='#f00';x.font='bold 10px Segoe UI';x.fillText('⚠',bx+1,by-10);
+x.fillStyle='#fff';x.font='7px Segoe UI';x.fillText('Ladrão',bx+1,by+24);
+
+x.textAlign='start';
 })();
 
-// --- TELA 5: LADRÃO ---
-(function() {
-    let c = document.getElementById('tela5');
-    let ctx = c.getContext('2d');
+// ===== TELA 5: GAME OVER =====
+(function(){
+let c=document.getElementById('t5'),x=c.getContext('2d');
+let W=296,H=420;
 
-    ctx.fillStyle = '#3d3d3d';
-    ctx.fillRect(0, 0, 400, 450);
+x.fillStyle='#1a1a2e';x.fillRect(0,0,W,H);
 
-    // Faixas
-    ctx.fillStyle = '#fff';
-    for (let y = 0; y < 450; y += 40) {
-        ctx.fillRect(198, y, 3, 20);
-    }
+// Caixa central
+x.fillStyle='rgba(0,0,0,0.6)';
+rrF(x,25,25,246,370,15);
+x.strokeStyle='#e94560';x.lineWidth=2;
+rrS(x,25,25,246,370,15);
 
-    // Jogador com pedido
-    let px = 190, py = 180;
-    ctx.fillStyle = '#e94560';
-    ctx.fillRect(px, py, 12, 28);
-    ctx.fillStyle = '#00b894';
-    ctx.fillRect(px - 1, py, 14, 10);
-    ctx.fillStyle = '#e94560';
-    ctx.beginPath();
-    ctx.arc(px + 6, py - 3, 5, 0, Math.PI * 2);
-    ctx.fill();
-    // Bag
-    ctx.fillStyle = '#ff6b35';
-    ctx.fillRect(px - 2, py + 10, 16, 10);
+x.textAlign='center';
 
-    // Seta indicando direção
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px Segoe UI';
-    ctx.textAlign = 'center';
-    ctx.fillText('← Alex com pedido', px + 80, py + 12);
+// Emoji triste
+x.font='40px serif';x.fillText('⏰',W/2,80);
 
-    // Ladrão atrás
-    let lx = 185, ly = 340;
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillRect(lx, ly, 12, 28);
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.arc(lx + 6, ly - 3, 5, 0, Math.PI * 2);
-    ctx.fill();
-    // Olhos vermelhos
-    ctx.fillStyle = '#ff0000';
-    ctx.fillRect(lx + 2, ly - 5, 3, 2);
-    ctx.fillRect(lx + 7, ly - 5, 3, 2);
-    // Mão estendida
-    ctx.fillStyle = '#8B6914';
-    ctx.fillRect(lx + 12, ly + 5, 10, 3);
+// Título
+x.fillStyle='#e94560';x.font='bold 24px Segoe UI';
+x.fillText('Tempo Esgotado!',W/2,120);
+x.fillStyle='#888';x.font='13px Segoe UI';
+x.fillText('O rush venceu dessa vez...',W/2,145);
 
-    // Alerta
-    ctx.fillStyle = '#ff0000';
-    ctx.font = 'bold 20px Segoe UI';
-    ctx.fillText('⚠', lx + 6, ly - 18);
-    ctx.font = 'bold 12px Segoe UI';
-    ctx.fillText('LADRÃO!', lx + 6, ly - 30);
+// Linha
+x.strokeStyle='#333';x.lineWidth=1;
+x.beginPath();x.moveTo(50,165);x.lineTo(246,165);x.stroke();
 
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px Segoe UI';
-    ctx.fillText('← Ladrão se aproximando', lx + 90, ly + 12);
+// Resultados
+x.font='16px Segoe UI';
+x.fillStyle='#fff';x.fillText('⭐ Pontuação:',120,200);
+x.fillStyle='#ffd700';x.font='bold 20px Segoe UI';x.fillText('1.250',220,200);
 
-    // Seta entre eles
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(196, py + 30);
-    ctx.lineTo(196, ly - 10);
-    ctx.stroke();
-    ctx.setLineDash([]);
+x.font='16px Segoe UI';
+x.fillStyle='#fff';x.fillText('📦 Entregas:',115,235);
+x.fillStyle='#ffd700';x.font='bold 20px Segoe UI';x.fillText('12',210,235);
 
-    ctx.fillStyle = '#e94560';
-    ctx.font = '10px Segoe UI';
-    ctx.fillText('Perseguição', 250, 270);
+x.font='16px Segoe UI';
+x.fillStyle='#fff';x.fillText('🏎️ Nível:',108,270);
+x.fillStyle='#ffd700';x.font='bold 20px Segoe UI';x.fillText('7',200,270);
 
-    // Dica
-    ctx.fillStyle = '#2ecc71';
-    ctx.font = '11px Segoe UI';
-    ctx.fillText('DESVIE para os lados para escapar!', 200, 420);
-    ctx.fillText('+50 pts se escapar', 200, 438);
+// Linha
+x.strokeStyle='#333';x.lineWidth=1;
+x.beginPath();x.moveTo(50,290);x.lineTo(246,290);x.stroke();
 
-    ctx.textAlign = 'start';
+// Botão
+let bg=x.createLinearGradient(55,310,241,350);
+bg.addColorStop(0,'#e94560');bg.addColorStop(1,'#c81d4e');
+x.fillStyle=bg;
+rrF(x,55,315,186,44,22);
+
+x.fillStyle='#fff';x.font='bold 14px Segoe UI';
+x.fillText('🔄 Tentar Novamente',W/2,343);
+
+// Seta de loop
+x.fillStyle='#555';x.font='10px Segoe UI';
+x.fillText('volta à Tela 1',W/2,380);
+
+x.textAlign='start';
 })();
-
-// --- TELA 6: GAME OVER ---
-(function() {
-    let c = document.getElementById('tela6');
-    let ctx = c.getContext('2d');
-
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, 400, 400);
-
-    // Caixa
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 2;
-    roundRect(ctx, 40, 30, 320, 340, 15);
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    roundRectPath(ctx, 40, 30, 320, 340, 15);
-    ctx.stroke();
-
-    ctx.fillStyle = '#e94560';
-    ctx.font = 'bold 28px Segoe UI';
-    ctx.textAlign = 'center';
-    ctx.fillText('Tempo Esgotado!', 200, 85);
-
-    ctx.fillStyle = '#aaa';
-    ctx.font = '14px Segoe UI';
-    ctx.fillText('O rush venceu dessa vez...', 200, 115);
-
-    // Resultados
-    ctx.fillStyle = '#fff';
-    ctx.font = '18px Segoe UI';
-    ctx.fillText('⭐ Pontuação: ', 170, 170);
-    ctx.fillStyle = '#ffd700';
-    ctx.fillText('850', 265, 170);
-
-    ctx.fillStyle = '#fff';
-    ctx.fillText('📦 Entregas: ', 165, 205);
-    ctx.fillStyle = '#ffd700';
-    ctx.fillText('8', 255, 205);
-
-    ctx.fillStyle = '#fff';
-    ctx.fillText('🏎️ Nível: ', 155, 240);
-    ctx.fillStyle = '#ffd700';
-    ctx.fillText('5', 240, 240);
-
-    // Botão
-    let grad = ctx.createLinearGradient(100, 280, 300, 320);
-    grad.addColorStop(0, '#e94560');
-    grad.addColorStop(1, '#c81d4e');
-    ctx.fillStyle = grad;
-    roundRect(ctx, 100, 290, 200, 45, 22, true);
-
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 15px Segoe UI';
-    ctx.fillText('Tentar Novamente', 200, 318);
-
-    ctx.textAlign = 'start';
-})();
-
-// --- FUNÇÕES AUXILIARES ---
-function roundRect(ctx, x, y, w, h, r, fill) {
-    ctx.beginPath();
-    roundRectPath(ctx, x, y, w, h, r);
-    if (fill) ctx.fill();
-    else { ctx.fill(); }
-}
-
-function roundRectPath(ctx, x, y, w, h, r) {
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-}
-
-function wrapText(ctx, text, x, y, maxW, lineH) {
-    let words = text.split(' ');
-    let line = '';
-    for (let i = 0; i < words.length; i++) {
-        let test = line + words[i] + ' ';
-        if (ctx.measureText(test).width > maxW && i > 0) {
-            ctx.fillText(line, x, y);
-            line = words[i] + ' ';
-            y += lineH;
-        } else {
-            line = test;
-        }
-    }
-    ctx.fillText(line, x, y);
-}
 </script>
 
 </body>
