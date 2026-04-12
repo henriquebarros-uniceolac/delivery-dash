@@ -25,13 +25,6 @@
         .capa h1 { color: #e94560; border: none; font-size: 2.8em; }
         .capa p { color: #ccc; word-break: break-all; }
         .capa .subtitulo { color: #ffd700; font-size: 1.3em; margin-top: 10px; }
-        .print-break { page-break-before: always; }
-
-        /* Evita que tabelas, blocos de código e caixas sejam cortados entre páginas */
-        table, .code-block, .destaque, .info { page-break-inside: avoid; }
-        tr { page-break-inside: avoid; }
-        h2, h3 { page-break-after: avoid; }
-
         @media print {
             body { padding: 15px; font-size: 11pt; }
             .capa { padding: 40px 15px; }
@@ -83,7 +76,7 @@
 </ol>
 
 <!-- ==================== 1. INTRODUÇÃO ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="intro">1. Introdução e Conceito do Jogo</h2>
 
 <p><strong>Delivery Dash — Brasília Edition</strong> é um jogo 2D com visão top-down (de cima para baixo) onde o jogador controla Alex, um entregador de moto que precisa fazer entregas pelas avenidas de Brasília.</p>
@@ -101,7 +94,7 @@
 </ul>
 
 <!-- ==================== 2. TECNOLOGIAS ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="tecnologias">2. Tecnologias Utilizadas</h2>
 
 <table>
@@ -149,7 +142,7 @@
 </ul>
 
 <!-- ==================== 3. ESTRUTURA ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="estrutura">3. Estrutura de Pastas e Arquivos</h2>
 
 <div class="code-block">delivery-dash/
@@ -174,7 +167,7 @@
 </ul>
 
 <!-- ==================== 4. HTML ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="html">4. HTML — Estrutura da Página</h2>
 
 <p>O arquivo <code>index.html</code> contém a estrutura de 3 telas que se alternam:</p>
@@ -219,7 +212,7 @@ let canvas = document.getElementById('canvas-jogo');
 let ctx = canvas.getContext('2d');</div>
 
 <!-- ==================== 5. CSS ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="css">5. CSS — Estilização e Responsividade</h2>
 
 <h3>Conceitos utilizados</h3>
@@ -243,7 +236,7 @@ let ctx = canvas.getContext('2d');</div>
 </ul>
 
 <!-- ==================== 6. CONFIG ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="config">6. config.js — Configurações do Jogo</h2>
 
 <p>Este arquivo centraliza todos os números que controlam o jogo. A vantagem de separar é que podemos ajustar a dificuldade sem mexer na lógica.</p>
@@ -272,7 +265,7 @@ let ctx = canvas.getContext('2d');</div>
 </ul>
 
 <!-- ==================== 7. JOGADOR ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="jogador">7. jogador.js — Controle do Personagem</h2>
 
 <p>Este arquivo cuida de tudo relacionado ao Alex (o entregador).</p>
@@ -324,7 +317,7 @@ if (teclas.ArrowLeft) jogador.x -= jogador.velocidade;</div>
 <p>Quando o jogador passa em uma poça, as variáveis <code>controlesInvertidos</code> e <code>framesInvertidos</code> são ativadas. Durante 2.5 segundos, a tecla da esquerda move pra direita e vice-versa, simulando derrapagem.</p>
 
 <!-- ==================== 8. OBSTÁCULOS ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="obstaculos">8. obstaculos.js — Sistema de Obstáculos</h2>
 
 <h3>Tipos de obstáculos</h3>
@@ -349,7 +342,7 @@ if (teclas.ArrowLeft) jogador.x -= jogador.velocidade;</div>
 <p>Carros e motos recebem cores aleatórias de um array quando são criados, dando variedade visual.</p>
 
 <!-- ==================== 9. ENTREGAS ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="entregas">9. entregas.js — Sistema de Entregas</h2>
 
 <h3>Ciclo de entrega</h3>
@@ -372,7 +365,7 @@ if (teclas.ArrowLeft) jogador.x -= jogador.velocidade;</div>
 </table>
 
 <!-- ==================== 10. GAME ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="game">10. game.js — Loop Principal e Sistemas</h2>
 
 <p>Este é o arquivo central que conecta tudo. Contém o loop principal e todos os sistemas especiais.</p>
@@ -420,7 +413,7 @@ if (teclas.ArrowLeft) jogador.x -= jogador.velocidade;</div>
 </ul>
 
 <!-- ==================== 11. MECÂNICAS ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="mecanicas">11. Mecânicas de Jogo</h2>
 
 <h3>Progressão de dificuldade</h3>
@@ -446,7 +439,7 @@ if (teclas.ArrowLeft) jogador.x -= jogador.velocidade;</div>
 </ul>
 
 <!-- ==================== 12. GAME DESIGN ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="gamedesign">12. Conceitos de Game Design</h2>
 
 <p>O jogo aplica conceitos de game design que criam uma experiência viciante:</p>
@@ -474,7 +467,7 @@ if (teclas.ArrowLeft) jogador.x -= jogador.velocidade;</div>
 <p>O jogo usa referências reais da cidade: monumentos (Congresso, Catedral, Ministérios), faixa exclusiva do BRT, e as avenidas do Eixo Monumental. Isso dá identidade e contexto local ao jogo.</p>
 
 <!-- ==================== 13. HOSPEDAGEM ==================== -->
-<div class="print-break"></div>
+<br>
 <h2 id="hospedagem">13. Hospedagem (GitHub Pages)</h2>
 
 <p>O jogo está hospedado gratuitamente no <strong>GitHub Pages</strong>, que transforma um repositório Git em um site público.</p>
