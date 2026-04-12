@@ -13,22 +13,42 @@
         p { margin-bottom: 12px; text-align: justify; }
         ul, ol { margin-left: 25px; margin-bottom: 15px; }
         li { margin-bottom: 6px; }
-        code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.95em; color: #c81d4e; }
-        .code-block { background: #1a1a2e; color: #e0e0e0; padding: 15px 20px; border-radius: 8px; margin: 12px 0; font-family: monospace; font-size: 0.9em; overflow-x: auto; white-space: pre; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; color: #c81d4e; word-break: break-all; }
+        .code-block { background: #1a1a2e; color: #e0e0e0; padding: 15px 20px; border-radius: 8px; margin: 12px 0; font-family: monospace; font-size: 0.8em; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
         .destaque { background: #fff3cd; border-left: 4px solid #ffd700; padding: 12px 15px; margin: 15px 0; border-radius: 0 6px 6px 0; }
         .info { background: #e8f4fd; border-left: 4px solid #3498db; padding: 12px 15px; margin: 15px 0; border-radius: 0 6px 6px 0; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        th, td { border: 1px solid #ddd; padding: 10px 12px; text-align: left; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; }
+        th, td { border: 1px solid #ddd; padding: 8px 10px; text-align: left; word-break: break-word; }
         th { background: #1a1a2e; color: white; }
         tr:nth-child(even) { background: #f9f9f9; }
         .capa { text-align: center; padding: 60px 20px; margin-bottom: 40px; border: 2px solid #e94560; border-radius: 15px; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; }
         .capa h1 { color: #e94560; border: none; font-size: 2.8em; }
-        .capa p { color: #ccc; }
+        .capa p { color: #ccc; word-break: break-all; }
         .capa .subtitulo { color: #ffd700; font-size: 1.3em; margin-top: 10px; }
         .print-break { page-break-before: always; }
+
+        /* Evita que tabelas, blocos de código e caixas sejam cortados entre páginas */
+        table, .code-block, .destaque, .info { page-break-inside: avoid; }
+        tr { page-break-inside: avoid; }
+        h2, h3 { page-break-after: avoid; }
+
         @media print {
-            body { padding: 20px; }
-            .print-break { page-break-before: always; }
+            body { padding: 15px; font-size: 11pt; }
+            .capa { padding: 40px 15px; }
+            .code-block { font-size: 9pt; }
+            table { font-size: 9pt; }
+        }
+
+        /* Mobile */
+        @media (max-width: 650px) {
+            body { padding: 15px; }
+            h1 { font-size: 1.6em; }
+            h2 { font-size: 1.2em; }
+            .capa h1 { font-size: 2em; }
+            .capa { padding: 30px 15px; }
+            table { font-size: 0.8em; }
+            th, td { padding: 5px 6px; }
+            .code-block { font-size: 0.75em; padding: 10px; }
         }
     </style>
 </head>
