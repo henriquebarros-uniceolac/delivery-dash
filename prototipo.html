@@ -199,6 +199,17 @@
             .header h1 { font-size: 1.8em; }
             .phone { width: 280px; }
         }
+
+        /* PDF / Impressão */
+        @media print {
+            body { background: #0a0a1a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .secao { page-break-inside: avoid !important; break-inside: avoid !important; }
+            .phone { page-break-inside: avoid !important; break-inside: avoid !important; }
+            .layout-duplo { page-break-inside: avoid !important; break-inside: avoid !important; flex-direction: column; align-items: center; }
+            .legenda-box { page-break-inside: avoid !important; break-inside: avoid !important; }
+            .fluxo { page-break-after: avoid; page-break-before: avoid; }
+            .header { page-break-after: avoid; }
+        }
     </style>
 </head>
 <body>
