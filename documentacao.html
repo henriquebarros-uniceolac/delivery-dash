@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação - Delivery Dash</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; color: #333; line-height: 1.7; padding: 40px; max-width: 900px; margin: 0 auto; }
+        h1 { color: #e94560; font-size: 2.2em; border-bottom: 3px solid #e94560; padding-bottom: 10px; margin-bottom: 20px; }
+        h2 { color: #1a1a2e; font-size: 1.5em; margin-top: 35px; margin-bottom: 12px; border-left: 4px solid #e94560; padding-left: 12px; }
+        h3 { color: #444; font-size: 1.15em; margin-top: 20px; margin-bottom: 8px; }
+        p { margin-bottom: 12px; text-align: justify; }
+        ul, ol { margin-left: 25px; margin-bottom: 15px; }
+        li { margin-bottom: 6px; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.95em; color: #c81d4e; }
+        .code-block { background: #1a1a2e; color: #e0e0e0; padding: 15px 20px; border-radius: 8px; margin: 12px 0; font-family: monospace; font-size: 0.9em; overflow-x: auto; white-space: pre; }
+        .destaque { background: #fff3cd; border-left: 4px solid #ffd700; padding: 12px 15px; margin: 15px 0; border-radius: 0 6px 6px 0; }
+        .info { background: #e8f4fd; border-left: 4px solid #3498db; padding: 12px 15px; margin: 15px 0; border-radius: 0 6px 6px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: white; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .capa { text-align: center; padding: 60px 20px; margin-bottom: 40px; border: 2px solid #e94560; border-radius: 15px; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; }
+        .capa h1 { color: #e94560; border: none; font-size: 2.8em; }
+        .capa p { color: #ccc; }
+        .capa .subtitulo { color: #ffd700; font-size: 1.3em; margin-top: 10px; }
+        .print-break { page-break-before: always; }
+        @media print {
+            body { padding: 20px; }
+            .print-break { page-break-before: always; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== CAPA ==================== -->
+<div class="capa">
+    <h1>🏍️ Delivery Dash</h1>
+    <p class="subtitulo">Brasília Edition</p>
+    <p style="margin-top: 30px; font-size: 1.1em;">Documentação Técnica do Projeto</p>
+    <p style="margin-top: 5px;">Disciplina: Desenvolvimento Web</p>
+    <p style="margin-top: 30px; font-size: 0.9em;">Repositório: github.com/henrique-uniceplac/delivery-dash</p>
+    <p style="font-size: 0.9em;">Jogo online: henrique-uniceplac.github.io/delivery-dash</p>
+</div>
+
+<!-- ==================== SUMÁRIO ==================== -->
+<h2>Sumário</h2>
+<ol>
+    <li><a href="#intro">Introdução e Conceito do Jogo</a></li>
+    <li><a href="#tecnologias">Tecnologias Utilizadas</a></li>
+    <li><a href="#estrutura">Estrutura de Pastas e Arquivos</a></li>
+    <li><a href="#html">HTML — Estrutura da Página</a></li>
+    <li><a href="#css">CSS — Estilização e Responsividade</a></li>
+    <li><a href="#config">config.js — Configurações do Jogo</a></li>
+    <li><a href="#jogador">jogador.js — Controle do Personagem</a></li>
+    <li><a href="#obstaculos">obstaculos.js — Sistema de Obstáculos</a></li>
+    <li><a href="#entregas">entregas.js — Sistema de Entregas</a></li>
+    <li><a href="#game">game.js — Loop Principal e Sistemas</a></li>
+    <li><a href="#mecanicas">Mecânicas de Jogo</a></li>
+    <li><a href="#gamedesign">Conceitos de Game Design</a></li>
+    <li><a href="#hospedagem">Hospedagem (GitHub Pages)</a></li>
+</ol>
+
+<!-- ==================== 1. INTRODUÇÃO ==================== -->
+<div class="print-break"></div>
+<h2 id="intro">1. Introdução e Conceito do Jogo</h2>
+
+<p><strong>Delivery Dash — Brasília Edition</strong> é um jogo 2D com visão top-down (de cima para baixo) onde o jogador controla Alex, um entregador de moto que precisa fazer entregas pelas avenidas de Brasília.</p>
+
+<h3>História</h3>
+<p>Em Brasília, a capital do caos urbano, você é Alex, o entregador mais rápido da cidade. Uma tempestade colossal paralisa a metrópole: ruas alagadas, trânsito engarrafado e pedestres desesperados. Sua missão: pilotar sua moto pelas avenidas do Eixo Monumental, desviando de obstáculos e fazendo entregas antes que o tempo acabe!</p>
+
+<h3>Objetivo</h3>
+<p>Coletar pedidos (📦) e entregar nos destinos (🏠), acumulando pontos e ganhando tempo extra, enquanto desvia de carros, buracos, pedestres e outros perigos.</p>
+
+<h3>Como se perde</h3>
+<ul>
+    <li><strong>Vidas:</strong> o jogador tem 5 vidas (❤️). Cada colisão com obstáculo tira 1 vida. Zero vidas = Game Over.</li>
+    <li><strong>Tempo:</strong> começa com 35 segundos. Se o tempo acabar = Game Over.</li>
+</ul>
+
+<!-- ==================== 2. TECNOLOGIAS ==================== -->
+<div class="print-break"></div>
+<h2 id="tecnologias">2. Tecnologias Utilizadas</h2>
+
+<table>
+    <tr>
+        <th>Tecnologia</th>
+        <th>O que é</th>
+        <th>Como usamos</th>
+    </tr>
+    <tr>
+        <td><strong>HTML5</strong></td>
+        <td>Linguagem de marcação que estrutura páginas web</td>
+        <td>Estrutura das 3 telas (início, jogo, game over), HUD, botões</td>
+    </tr>
+    <tr>
+        <td><strong>CSS3</strong></td>
+        <td>Linguagem de estilo que define a aparência visual</td>
+        <td>Layout, cores, animações, responsividade mobile</td>
+    </tr>
+    <tr>
+        <td><strong>JavaScript (ES6)</strong></td>
+        <td>Linguagem de programação que roda no navegador</td>
+        <td>Toda a lógica do jogo: movimento, colisão, pontuação, desenho</td>
+    </tr>
+    <tr>
+        <td><strong>Canvas API</strong></td>
+        <td>API do HTML5 para desenhar gráficos 2D via JavaScript</td>
+        <td>Desenho de toda a parte visual do jogo (estrada, moto, obstáculos)</td>
+    </tr>
+    <tr>
+        <td><strong>GitHub Pages</strong></td>
+        <td>Serviço gratuito de hospedagem de sites estáticos</td>
+        <td>Publicação do jogo online para qualquer pessoa acessar</td>
+    </tr>
+</table>
+
+<div class="info">
+    <strong>Importante:</strong> Não utilizamos nenhuma biblioteca externa, framework ou engine de jogos. Todo o código foi escrito do zero usando apenas as tecnologias nativas do navegador. Isso mostra o entendimento dos fundamentos.
+</div>
+
+<h3>Por que essas tecnologias?</h3>
+<ul>
+    <li><strong>HTML/CSS/JS</strong> — São as 3 tecnologias base da web. Qualquer navegador roda sem precisar instalar nada.</li>
+    <li><strong>Canvas API</strong> — Permite desenhar formas, textos e gráficos diretamente no navegador, sem precisar de imagens externas.</li>
+    <li><strong>Sem bibliotecas</strong> — Tudo feito na mão, demonstrando conhecimento das bases.</li>
+</ul>
+
+<!-- ==================== 3. ESTRUTURA ==================== -->
+<div class="print-break"></div>
+<h2 id="estrutura">3. Estrutura de Pastas e Arquivos</h2>
+
+<div class="code-block">delivery-dash/
+├── index.html          ← Página principal (telas do jogo)
+├── documentacao.html   ← Este documento
+├── css/
+│   └── style.css       ← Todos os estilos visuais
+├── js/
+│   ├── config.js       ← Configurações e constantes
+│   ├── jogador.js      ← Controle do personagem (Alex)
+│   ├── obstaculos.js   ← Carros, buracos, pedestres, motos, poças
+│   ├── entregas.js     ← Sistema de pedidos e destinos
+│   └── game.js         ← Loop principal + todos os sistemas
+└── assets/             ← Pasta para recursos futuros</div>
+
+<h3>Por que separar em arquivos?</h3>
+<p>Cada arquivo tem uma <strong>responsabilidade única</strong>. Isso facilita:</p>
+<ul>
+    <li><strong>Manutenção:</strong> se algo der errado nos obstáculos, sabemos que o problema está em <code>obstaculos.js</code></li>
+    <li><strong>Organização:</strong> cada membro do grupo pode trabalhar em um arquivo diferente</li>
+    <li><strong>Entendimento:</strong> é mais fácil entender 5 arquivos pequenos do que 1 arquivo gigante</li>
+</ul>
+
+<!-- ==================== 4. HTML ==================== -->
+<div class="print-break"></div>
+<h2 id="html">4. HTML — Estrutura da Página</h2>
+
+<p>O arquivo <code>index.html</code> contém a estrutura de 3 telas que se alternam:</p>
+
+<table>
+    <tr>
+        <th>Tela</th>
+        <th>ID</th>
+        <th>O que contém</th>
+    </tr>
+    <tr>
+        <td>Tela Inicial</td>
+        <td><code>tela-inicio</code></td>
+        <td>Título, história do jogo, instruções, botão "Começar"</td>
+    </tr>
+    <tr>
+        <td>Tela do Jogo</td>
+        <td><code>tela-jogo</code></td>
+        <td>HUD (vidas, tempo, pontos), Canvas, controles mobile</td>
+    </tr>
+    <tr>
+        <td>Tela Game Over</td>
+        <td><code>tela-gameover</code></td>
+        <td>Mensagem de derrota, pontuação final, botão "Tentar Novamente"</td>
+    </tr>
+</table>
+
+<h3>Como as telas alternam?</h3>
+<p>Usamos a classe CSS <code>escondido</code> que aplica <code>display: none</code>. Quando o jogador clica em "Começar", o JavaScript remove essa classe da tela do jogo e adiciona na tela inicial.</p>
+
+<div class="code-block">// Exemplo: trocar da tela inicial para o jogo
+document.getElementById('tela-inicio').classList.add('escondido');
+document.getElementById('tela-jogo').classList.remove('escondido');</div>
+
+<h3>O elemento Canvas</h3>
+<p>O <code>&lt;canvas&gt;</code> é o elemento HTML onde todo o jogo é desenhado. Ele funciona como uma tela de pintura — o JavaScript desenha cada frame nele.</p>
+
+<div class="code-block">&lt;canvas id="canvas-jogo"&gt;&lt;/canvas&gt;
+
+// No JavaScript, pegamos o contexto 2D para desenhar:
+let canvas = document.getElementById('canvas-jogo');
+let ctx = canvas.getContext('2d');</div>
+
+<!-- ==================== 5. CSS ==================== -->
+<div class="print-break"></div>
+<h2 id="css">5. CSS — Estilização e Responsividade</h2>
+
+<h3>Conceitos utilizados</h3>
+<table>
+    <tr><th>Conceito CSS</th><th>Onde usamos</th><th>O que faz</th></tr>
+    <tr><td>Flexbox</td><td>HUD, telas, controles</td><td>Alinha elementos horizontal/verticalmente</td></tr>
+    <tr><td>Media Query</td><td><code>@media (max-width: 650px)</code></td><td>Aplica estilos diferentes no celular</td></tr>
+    <tr><td>Position Fixed</td><td>HUD, controles mobile</td><td>Fixa elementos na tela (não se movem com scroll)</td></tr>
+    <tr><td>Gradiente</td><td>Botões</td><td>Cria efeito de cor degradê</td></tr>
+    <tr><td>Transition</td><td>Botões (hover)</td><td>Animação suave ao passar o mouse</td></tr>
+    <tr><td>Keyframes</td><td>Mensagem de entrega</td><td>Animação de "aparecer" deslizando</td></tr>
+</table>
+
+<h3>Responsividade (Mobile)</h3>
+<p>Usamos <code>@media (max-width: 650px)</code> para detectar telas de celular. Quando ativo:</p>
+<ul>
+    <li>Canvas se ajusta ao tamanho da tela</li>
+    <li>Botões direcionais (touch) aparecem como overlay semitransparente</li>
+    <li>HUD fica compacto</li>
+    <li>Fontes e espaçamentos reduzidos</li>
+</ul>
+
+<!-- ==================== 6. CONFIG ==================== -->
+<div class="print-break"></div>
+<h2 id="config">6. config.js — Configurações do Jogo</h2>
+
+<p>Este arquivo centraliza todos os números que controlam o jogo. A vantagem de separar é que podemos ajustar a dificuldade sem mexer na lógica.</p>
+
+<h3>Principais configurações</h3>
+<table>
+    <tr><th>Constante</th><th>Valor</th><th>O que controla</th></tr>
+    <tr><td><code>LARGURA_CANVAS</code></td><td>800</td><td>Resolução interna horizontal do jogo</td></tr>
+    <tr><td><code>ALTURA_CANVAS</code></td><td>600</td><td>Resolução interna vertical do jogo</td></tr>
+    <tr><td><code>CONFIG_TEMPO.inicial</code></td><td>35</td><td>Segundos iniciais</td></tr>
+    <tr><td><code>CONFIG_TEMPO.bonusEntrega</code></td><td>4</td><td>Segundos ganhos por entrega</td></tr>
+    <tr><td><code>CONFIG_VIDAS.inicial</code></td><td>5</td><td>Vidas iniciais</td></tr>
+    <tr><td><code>CONFIG_DIFICULDADE.obstaculosMaximo</code></td><td>8</td><td>Máximo de obstáculos na tela</td></tr>
+    <tr><td><code>CONFIG_DIFICULDADE.velocidadeMaxima</code></td><td>5</td><td>Velocidade máxima dos obstáculos</td></tr>
+</table>
+
+<h3>Cenários por nível</h3>
+<p>A função <code>obterCenarioNivel(nivel)</code> retorna as cores e efeitos visuais para cada fase:</p>
+<ul>
+    <li><strong>Nível 1-2:</strong> Dia ensolarado</li>
+    <li><strong>Nível 3-4:</strong> Entardecer (tons laranja)</li>
+    <li><strong>Nível 5-6:</strong> Noite (escuro + farol na moto)</li>
+    <li><strong>Nível 7-8:</strong> Chuva noturna (gotas caindo)</li>
+    <li><strong>Nível 9-10:</strong> Neblina (visibilidade reduzida)</li>
+    <li><strong>Nível 11+:</strong> Tempestade (chuva forte + relâmpagos)</li>
+</ul>
+
+<!-- ==================== 7. JOGADOR ==================== -->
+<div class="print-break"></div>
+<h2 id="jogador">7. jogador.js — Controle do Personagem</h2>
+
+<p>Este arquivo cuida de tudo relacionado ao Alex (o entregador).</p>
+
+<h3>Funções principais</h3>
+<table>
+    <tr><th>Função</th><th>O que faz</th></tr>
+    <tr><td><code>inicializarJogador()</code></td><td>Posiciona o jogador no centro-inferior do canvas</td></tr>
+    <tr><td><code>configurarTeclas()</code></td><td>Captura quando o jogador pressiona/solta as setas</td></tr>
+    <tr><td><code>configurarControlesMobile()</code></td><td>Adiciona eventos touch nos botões direcionais</td></tr>
+    <tr><td><code>moverJogador()</code></td><td>Atualiza a posição baseado nas teclas pressionadas</td></tr>
+    <tr><td><code>desenharJogador(ctx)</code></td><td>Desenha a moto + Alex no canvas</td></tr>
+    <tr><td><code>verificarColisao(obj1, obj2)</code></td><td>Detecta se dois retângulos estão se tocando</td></tr>
+</table>
+
+<h3>Como funciona o movimento?</h3>
+<p>Usamos dois event listeners: <code>keydown</code> (tecla pressionada) e <code>keyup</code> (tecla solta). Isso permite movimento contínuo enquanto segura a tecla.</p>
+
+<div class="code-block">// Quando pressiona a tecla, marca como true
+document.addEventListener('keydown', function(evento) {
+    teclas[evento.key] = true;
+});
+
+// Quando solta, marca como false
+document.addEventListener('keyup', function(evento) {
+    teclas[evento.key] = false;
+});
+
+// A cada frame, verifica quais teclas estão true e move
+if (teclas.ArrowLeft) jogador.x -= jogador.velocidade;</div>
+
+<h3>Detecção de colisão (AABB)</h3>
+<p>Usamos a técnica <strong>AABB (Axis-Aligned Bounding Box)</strong> — verificamos se dois retângulos se sobrepõem comparando suas bordas:</p>
+
+<div class="code-block">function verificarColisao(obj1, obj2) {
+    return (
+        obj1.x < obj2.x + obj2.largura &&
+        obj1.x + obj1.largura > obj2.x &&
+        obj1.y < obj2.y + obj2.altura &&
+        obj1.y + obj1.altura > obj2.y
+    );
+}</div>
+
+<div class="destaque">
+    <strong>Para explicar ao professor:</strong> "Comparamos as 4 bordas dos dois retângulos. Se nenhuma borda está separada, significa que estão se tocando — ou seja, houve colisão."
+</div>
+
+<h3>Controles invertidos (poça d'água)</h3>
+<p>Quando o jogador passa em uma poça, as variáveis <code>controlesInvertidos</code> e <code>framesInvertidos</code> são ativadas. Durante 2.5 segundos, a tecla da esquerda move pra direita e vice-versa, simulando derrapagem.</p>
+
+<!-- ==================== 8. OBSTÁCULOS ==================== -->
+<div class="print-break"></div>
+<h2 id="obstaculos">8. obstaculos.js — Sistema de Obstáculos</h2>
+
+<h3>Tipos de obstáculos</h3>
+<table>
+    <tr><th>Tipo</th><th>Visual</th><th>Comportamento</th><th>Quando aparece</th></tr>
+    <tr><td>Carro</td><td>Retângulo com janelas e rodas (10 cores)</td><td>Desce pela pista, mais rápido que buracos</td><td>Sempre</td></tr>
+    <tr><td>Buraco</td><td>Elipse escura</td><td>Desce devagar (estático)</td><td>Sem chuva</td></tr>
+    <tr><td>Pedestre</td><td>Círculo (cabeça) + retângulo (corpo)</td><td>Desce devagar</td><td>Sempre</td></tr>
+    <tr><td>Moto</td><td>Moto detalhada com piloto e capacete</td><td>Mais rápida que carros</td><td>Nível 8+</td></tr>
+    <tr><td>Poça</td><td>Elipse azul com reflexo</td><td>Não tira vida, inverte controles</td><td>Com chuva</td></tr>
+</table>
+
+<h3>Como os obstáculos funcionam?</h3>
+<ol>
+    <li>São criados acima da tela (posição Y negativa)</li>
+    <li>Descem a cada frame (simulando a moto avançando)</li>
+    <li>Quando saem por baixo da tela, voltam ao topo com posição X aleatória</li>
+    <li>A quantidade e velocidade aumentam conforme o nível</li>
+</ol>
+
+<h3>Cores aleatórias</h3>
+<p>Carros e motos recebem cores aleatórias de um array quando são criados, dando variedade visual.</p>
+
+<!-- ==================== 9. ENTREGAS ==================== -->
+<div class="print-break"></div>
+<h2 id="entregas">9. entregas.js — Sistema de Entregas</h2>
+
+<h3>Ciclo de entrega</h3>
+<ol>
+    <li>Um <strong>PEDIDO</strong> (caixa laranja pulsante) aparece na pista</li>
+    <li>O jogador coleta o pedido (colisão) → mensagem "Pedido coletado!"</li>
+    <li>Um <strong>DESTINO</strong> (marcador verde com casinha) aparece</li>
+    <li>O jogador entrega no destino (colisão) → ganha pontos + tempo</li>
+    <li>Timer pausa por 3 segundos (respiro)</li>
+    <li>Novo pedido aparece (ciclo recomeça)</li>
+</ol>
+
+<h3>Funções</h3>
+<table>
+    <tr><th>Função</th><th>O que faz</th></tr>
+    <tr><td><code>criarPedido()</code></td><td>Gera pedido em posição aleatória na estrada</td></tr>
+    <tr><td><code>criarDestino()</code></td><td>Gera destino longe do jogador (mínimo 200px)</td></tr>
+    <tr><td><code>verificarEntregas()</code></td><td>Checa colisão com pedido e destino</td></tr>
+    <tr><td><code>desenharEntregas(ctx)</code></td><td>Desenha pedido/destino com efeito pulsante</td></tr>
+</table>
+
+<!-- ==================== 10. GAME ==================== -->
+<div class="print-break"></div>
+<h2 id="game">10. game.js — Loop Principal e Sistemas</h2>
+
+<p>Este é o arquivo central que conecta tudo. Contém o loop principal e todos os sistemas especiais.</p>
+
+<h3>O Loop Principal (Game Loop)</h3>
+<p>O conceito mais importante de qualquer jogo. É uma função que roda ~60 vezes por segundo e executa sempre na mesma ordem:</p>
+
+<div class="code-block">function loopPrincipal() {
+    1. Limpa o canvas
+    2. Desenha o cenário (estrada, monumentos)
+    3. Move e desenha obstáculos
+    4. Move e desenha o jogador
+    5. Verifica colisões
+    6. Verifica entregas
+    7. Desenha efeitos (chuva, neblina)
+    8. Atualiza HUD
+    9. requestAnimationFrame(loopPrincipal) → repete
+}</div>
+
+<div class="destaque">
+    <strong>Para explicar ao professor:</strong> "O <code>requestAnimationFrame</code> é uma função do navegador que chama nossa função a cada frame (~60fps). Isso cria a ilusão de movimento, igual um desenho animado — vários quadros por segundo."
+</div>
+
+<h3>Sistemas implementados no game.js</h3>
+
+<table>
+    <tr><th>Sistema</th><th>Como funciona</th></tr>
+    <tr><td><strong>Vidas</strong></td><td>5 corações. Colisão = -1. Coração aparece na pista para recuperar. 0 = Game Over.</td></tr>
+    <tr><td><strong>Timer</strong></td><td>35s inicial. +4s por entrega. Pausa 3s ao entregar. Relógio aparece quando faltam 10s.</td></tr>
+    <tr><td><strong>Escudo</strong></td><td>Item azul na pista. 6 segundos de invencibilidade. Aura azul pulsante ao redor.</td></tr>
+    <tr><td><strong>Ladrão</strong></td><td>Nível 7+. Moto preta aparece atrás. 2s de alerta. Tenta roubar o pedido. Jogador pode desviar.</td></tr>
+    <tr><td><strong>BRT</strong></td><td>Faixa cinza "BRT" aparece por 20s. Ônibus amarelos passam rápido. Colisão = perde vida.</td></tr>
+    <tr><td><strong>Cenários</strong></td><td>Cores mudam por nível: dia → entardecer → noite → chuva → neblina → tempestade.</td></tr>
+    <tr><td><strong>Capa de chuva</strong></td><td>Alex troca a jaqueta verde por capa preta quando chove.</td></tr>
+    <tr><td><strong>Monumentos</strong></td><td>Ministérios, Congresso, Catedral e Palácio descem pelas laterais.</td></tr>
+</table>
+
+<h3>Cenário de Brasília</h3>
+<p>As laterais da pista exibem monumentos famosos de Brasília, desenhados com formas geométricas simples no Canvas:</p>
+<ul>
+    <li><strong>Ministérios:</strong> retângulo com pilotis (colunas) e janelas azuis espelhadas</li>
+    <li><strong>Congresso Nacional:</strong> torres gêmeas + cúpula do Senado + cúpula invertida da Câmara</li>
+    <li><strong>Catedral:</strong> costelas curvas com vitrais azuis e cruz no topo</li>
+    <li><strong>Palácio da Alvorada:</strong> fachada de vidro com colunas em formato de asa</li>
+</ul>
+
+<!-- ==================== 11. MECÂNICAS ==================== -->
+<div class="print-break"></div>
+<h2 id="mecanicas">11. Mecânicas de Jogo</h2>
+
+<h3>Progressão de dificuldade</h3>
+<ul>
+    <li>A cada 3 entregas, sobe 1 nível</li>
+    <li>Cada nível adiciona +1 obstáculo (máximo 8)</li>
+    <li>Velocidade dos obstáculos aumenta +0.25 por nível (máximo 5)</li>
+    <li>Novos tipos de obstáculo aparecem (motos no nível 8+)</li>
+    <li>Ladrões aparecem a partir do nível 7</li>
+    <li>Cenário muda: dia → noite → chuva → tempestade</li>
+</ul>
+
+<h3>Balanceamento</h3>
+<p>O jogo foi balanceado para ser desafiante mas jogável:</p>
+<ul>
+    <li>Máximo de 8 obstáculos na tela (sempre tem passagem)</li>
+    <li>Velocidade máxima de 5 (nunca fica impossível)</li>
+    <li>Timer pausa 3s após entrega (respiro)</li>
+    <li>Relógio de bônus aparece quando faltam 10s</li>
+    <li>Escudo aparece periodicamente</li>
+    <li>Coração de recuperação aparece após perder vida</li>
+    <li>Invencibilidade de 1.5s após levar dano</li>
+</ul>
+
+<!-- ==================== 12. GAME DESIGN ==================== -->
+<div class="print-break"></div>
+<h2 id="gamedesign">12. Conceitos de Game Design</h2>
+
+<p>O jogo aplica conceitos de game design que criam uma experiência viciante:</p>
+
+<h3>Loop de Gameplay</h3>
+<p>Jogar → Perder → Tentar de novo. O jogador sempre quer "mais uma tentativa" porque sente que pode ir mais longe.</p>
+
+<h3>Mecânica de Recompensa</h3>
+<p>Cada entrega dá feedback positivo imediato (pontos + tempo + mensagem). Isso ativa a dopamina do jogador.</p>
+
+<h3>Escala de Dificuldade</h3>
+<p>A dificuldade sobe gradualmente. O jogador não percebe que ficou mais difícil — ele se adapta. Quando perde, sente que "quase conseguiu".</p>
+
+<h3>Feedback Visual</h3>
+<ul>
+    <li>Flash vermelho ao levar dano</li>
+    <li>Flash azul ao passar na poça</li>
+    <li>Jogador pisca quando invencível</li>
+    <li>Aura azul quando com escudo</li>
+    <li>Pedidos e itens pulsam para chamar atenção</li>
+    <li>⚠️ piscando quando ladrão se aproxima</li>
+</ul>
+
+<h3>Elementos de Brasília</h3>
+<p>O jogo usa referências reais da cidade: monumentos (Congresso, Catedral, Ministérios), faixa exclusiva do BRT, e as avenidas do Eixo Monumental. Isso dá identidade e contexto local ao jogo.</p>
+
+<!-- ==================== 13. HOSPEDAGEM ==================== -->
+<div class="print-break"></div>
+<h2 id="hospedagem">13. Hospedagem (GitHub Pages)</h2>
+
+<p>O jogo está hospedado gratuitamente no <strong>GitHub Pages</strong>, que transforma um repositório Git em um site público.</p>
+
+<h3>Como funciona</h3>
+<ol>
+    <li>O código está no GitHub em: <code>github.com/henrique-uniceplac/delivery-dash</code></li>
+    <li>O GitHub Pages serve os arquivos como um site estático</li>
+    <li>Qualquer pessoa pode jogar acessando: <code>henrique-uniceplac.github.io/delivery-dash</code></li>
+    <li>A cada <code>git push</code>, o site atualiza automaticamente</li>
+</ol>
+
+<h3>Ferramentas usadas</h3>
+<ul>
+    <li><strong>Git:</strong> controle de versão (histórico de alterações)</li>
+    <li><strong>GitHub:</strong> repositório remoto na nuvem</li>
+    <li><strong>GitHub CLI (gh):</strong> ferramenta de linha de comando para interagir com o GitHub</li>
+</ul>
+
+<div class="info">
+    <strong>Para explicar ao professor:</strong> "Usamos Git para versionar o código (cada alteração fica salva no histórico) e GitHub Pages para publicar o jogo online gratuitamente, sem precisar de servidor."
+</div>
+
+<br><br>
+<hr>
+<p style="text-align: center; color: #999; margin-top: 30px;">
+    Delivery Dash — Brasília Edition<br>
+    Documento gerado para fins acadêmicos<br>
+    Repositório: github.com/henrique-uniceplac/delivery-dash
+</p>
+
+</body>
+</html>
